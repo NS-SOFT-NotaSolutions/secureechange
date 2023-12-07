@@ -104,38 +104,37 @@ SecureEchange se compose des tiers suivants:
 # Construction des images
 ## AUTH image
 ```
-docker build --no-cache -f Dockerfile_auth -t jacquesmassa/auth_secure_echange:1_0_1_20 .   
-docker push jacquesmassa/auth_secure_echange:1_0_1_20      
+docker build -f Dockerfile_auth -t xxxxxxx/auth_secure_echange .   
+docker push xxxxxxx/auth_secure_echange      
 ```
 ## REAL Image
 ```
-docker build --no-cache -f Dockerfile_real -t jacquesmassa/real_secure_echange:1_0_0_6 .    
-docker push jacquesmassa/real_secure_echange:1_0_0_6   
+docker build -f Dockerfile_real -t xxxxxxx/real_secure_echange .    
+docker push xxxxxxx/real_secure_echange   
 ```
 
 ## PUBLIC API & Web Site image (Production)
 ```
-docker build -f Dockerfile_public -t jacquesmassa/public_secure_echange:1_0_1_14  .
-docker push jacquesmassa/public_secure_echange:1_0_1_14
+docker build -f Dockerfile_public -t xxxxxxx/public_secure_echange  .
+docker push xxxxxxx/public_secure_echange
 ```
 
 ## PUBLIC API & Web Site image (Preproduction)
 ```
-docker build -f Dockerfile_preprod -t jacquesmassa/preprod_public_secure_echange:1_0_1_52 .
-docker push jacquesmassa/preprod_public_secure_echange:1_0_1_52
+docker build -f Dockerfile_preprod -t xxxxxxx/preprod_public_secure_echange .
+docker push xxxxxxx/preprod_public_secure_echange
 ```
 
 ## INTERNAL APIs image
 ```
-docker build -f Dockerfile_internal -t jacquesmassa/internal_secure_echange:1_0_1_16  .
-docker push jacquesmassa/internal_secure_echange:1_0_1_16
+docker build -f Dockerfile_internal -t xxxxxxx/internal_secure_echange  .
+docker push xxxxxxx/internal_secure_echange
 ```
-
 
 ## ADMIN image 
 ```
-docker build -f Dockerfile_admin -t jacquesmassa/admin_secure_echange:1_0_1_18  .
-docker push jacquesmassa/admin_secure_echange:1_0_1_18
+docker build -f Dockerfile_admin -t xxxxxxx/admin_secure_echange  .
+docker push xxxxxxx/admin_secure_echange
 ```
 
 
