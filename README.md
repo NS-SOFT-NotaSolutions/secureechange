@@ -45,7 +45,7 @@
 >>>Admin image
 >
 
-#Vue Globale
+# Vue Globale
 L'objectif de SecureEchange est de permettre, l'envoi et la réception de documents sensibles en assurant l'origine, l'intégrité et le suivi des actions des documents échangés.  
 Pour atteindre cet objectif, SecureEchange met en oeuvre plusieurs stratégies :
 - Authentification forte de l'office ou l'entreprise qui initie le transfère.
