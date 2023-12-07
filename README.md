@@ -1,5 +1,5 @@
 ---
-#<img src="/Documentation/images/SecureEchange-165.png" width="40" height="40">SecureEchange &reg; 
+# <img src="/Documentation/images/SecureEchange-165.png" width="40" height="40">SecureEchange &reg; 
 
 > Envoyez et recevez vos documents en toute sécurité.
 
