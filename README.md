@@ -1,7 +1,6 @@
 ---
 # <img src="/Documentation/images/SecureEchange-165.png" width="40" height="40">SecureEchange &reg; 
-
-> Envoyez et recevez vos documents en toute sécurité.
+### Envoyez et recevez vos documents en toute sécurité.
 
 ***[Présentation commerciale](https://www.notasolutions.fr/secure-echange/)***
 
@@ -10,39 +9,39 @@
 >Vue globale
 >
 >Architecture applicative
->>Services Authentification Endpoints
->>Private Endpoints
->>Public Endpoints
->>Admin Endpoints
->>Web Site
->>Partenaires Endpoints
+>- Services Authentification Endpoints
+>- Private Endpoints
+>- Public Endpoints
+>- Admin Endpoints
+>- Web Site
+>- Partenaires Endpoints
 >
 >Interopérabilité Notariale
 >
 >RGPD
 >
 >Architecture Matériel
->>Kubernetes
->>Devops YAMLs
+>- Kubernetes
+>- Devops YAMLs
 >
 >Sécurisé par Design
->>Stratégie sécurité sur les rôles pour les Endpoints
->>Liste de contrôles d'accès sur les entités
->>>Permission Denied
->>>Permission Granted
+>- Stratégie sécurité sur les rôles pour les Endpoints
+>- Liste de contrôles d'accès sur les entités
+  >- Permission Denied
+  >- Permission Granted
 >
 >Construction des images
->>Services d'authentification
->>>Auth Image
->>>REAL Image
->>
->>APIs
->>>Public API & Web Site Image (Production)
->>>Public API & Web Site Image (Preproduction)
->>>Internal APIs image
->>
->>Services d'administration
->>>Admin image
+>- Services d'authentification
+  >- Auth Image
+  >- REAL Image
+>
+>- APIs
+  >- Public API & Web Site Image (Production)
+  >- Public API & Web Site Image (Preproduction)
+  >- Internal APIs image
+  >
+>- Services d'administration
+  >- Admin image
 >
 
 # Vue Globale
@@ -61,46 +60,46 @@ Pour atteindre cet objectif, SecureEchange met en oeuvre plusieurs stratégies :
 
 SecureEchange se compose des tiers suivants:
 - Poste de travail de l'office ou l'entreprise
->- Navigateur + client javascript + Html (Angular) : https://secure-echange.notasolutions.fr
->- Interopérabilité Notariale (Office notarial)
->- Outlook
+  - Navigateur + client javascript + Html (Angular) : https://secure-echange.notasolutions.fr
+  - Interopérabilité Notariale (Office notarial)
+  - Outlook
 
 -Poste de Travail du client final
->- PC:  Edge ou Chrome ou Firefox
->- Mobile: Safari, Chrome
+  - PC:  Edge ou Chrome ou Firefox
+  - Mobile: Safari, Chrome
 
 - Back-End
->- APIs (Restfull paradigm)
->- Base de données (NoSQL - Mongo)
->- Cache mémoire partagé (Redis)
+  - APIs (Restfull paradigm)
+  - Base de données (NoSQL - Mongo)
+  - Cache mémoire partagé (Redis)
 
 - Partenaires
->- LexIA by Lexfluent
->- SMS MODE
->- Oodrive 
+  - LexIA by Lexfluent
+  - SMS MODE
+  - Oodrive 
 
-##Architecture applicative
-###Services Authentification Endpoints
-###Private Endpoints
-###Public Endpoints
-###Admin Endpoints
-###Web Site
-###Partenaires Endpoints
-###Interopérabilité Notariale
+## Architecture applicative
+### Services Authentification Endpoints
+### Private Endpoints
+### Public Endpoints
+### Admin Endpoints
+### Web Site
+### Partenaires Endpoints
+### Interopérabilité Notariale
 
-#RGPD
+# RGPD
 
-#Architecture Matériel
-##Kubernetes
-##Devops YAMLs
+# Architecture Matériel
+## Kubernetes
+## Devops YAMLs
 
-#Sécurisé par Design
+# Sécurisé par Design
 
-##Stratégie sécurité sur les rôles pour les Endpoints
-##Liste de contrôles d'accès sur les entités
-###Permission Denied
-###Permission Granted
-##Cycle de vie d'un jeton d'authentification
+## Stratégie sécurité sur les rôles pour les Endpoints
+## Liste de contrôles d'accès sur les entités
+### Permission Denied
+### Permission Granted
+## Cycle de vie d'un jeton d'authentification
 
 # Construction des images
 ## AUTH image
