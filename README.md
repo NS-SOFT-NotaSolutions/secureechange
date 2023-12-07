@@ -9,12 +9,12 @@
 >Présentation
 >
 >Architecture
->- Services Authentification Endpoints
->- Private Endpoints
->- Public Endpoints
->- Admin Endpoints
->- Web Site
->- Partenaires Endpoints
+>- Services Authentification 
+>- API privés
+>- API Publics
+>- API Administration
+>- Site web public et privé
+>- Partenaires
 >- Interopérabilité Notariale
 >
 >Architecture Matériel
@@ -92,7 +92,7 @@ Comme on peut le comprendre depuis les schémas ci-dessus, SecureEchange doit in
 - OODRIVE pour les demandes de signatures électroniques avancées eIDAS.
 - LexIA pour la reconnaissance et la vérification des RIBs.
 - La clé REAL qui permet une authentification forte grâce à un dispositif physique (clé USB) et code PIN. Et qui permet aussi la signature qualifiée eIDAS des documents PDF.
-- La clé Certigreffe qui permet une authentification forte grâce à une dispositif physique (clé USB) et code PIN. Et qui permet aussi la signature qualifiée eIDAS des documents PDF.
+- La clé AVOCAT qui permet une authentification forte grâce à une dispositif physique (clé USB) et code PIN. Et qui permet aussi la signature qualifiée eIDAS des documents PDF.
 - La clé Certinomis qui permet une authentitication forte grâce à un dispositif physique (clé USB) et code PIN. Et qui permet aussi la signature qualifiée eIDAS des documents PDF.
 - Le client final qui reçoit les documents envoyés et envoit ceux requis.
 
@@ -107,17 +107,37 @@ Afin d'atteindre ces objectifs, SecureEchange a été découpé en plusieurs par
 - Une application Web réservée aux clients finaux.
 
 
-### Services Authentification Endpoints
+### Les services Authentification
+
 #### Authentification par clé REAL
-La clé REAL est un dispositif physique sécurisée élaboré par l'ADSN et sous l'autorité du Conseil Supérieur du Notariat qui permet de signer les actes électroniques et s'authentifier pour diverses formalités.  Ce dispositif est disponible pour les notaires et pour les clercs bien que les rôles et permissions sont spécifiques à chaque acteur. Ce dispositif dépend  
-#### Authentification par clé Certigreffe ou Certinomis
-#### Authentification par Indentifiant et mot de passe (Auth0)
+La clé REAL&reg; est un dispositif physique, sécurisée avec un code PIN et contenant un certificat de signature, élaboré par l'ADSN et sous l'autorité du Conseil Supérieur du Notariat qui permet de signer les actes électroniques et s'authentifier pour diverses formalités.  Ce dispositif est disponible pour les notaires et pour les clercs bien que les rôles et permissions soient spécifiques à chaque acteur. Ce dispositif dépend de l'autorité de certification Racine Notaires 20XX, cette autorité est qualifiée eIDAS. 
+Son utilisation dans le cadre de l'authentification des notaires et clercs permet une authentification forte des utilisateurs.  
+Cependant la profession, préfère que cette clé soit utilisée uniquement dans le cadre des signatures électroniques des actes et des formalités réglementaires. Son utilisation en tant que dispositif d'authentification pour les applications autres que celles réglementaires n'est pas préconisé ou encouragé.  
+
+#### Authentification par Identifiant et mot de passe (Auth0)
+Pour tous les acteurs qui ne possèdent pas de dispositif sécurisé tel que la clé REAL&reg;, nous proposons une authentification basée sur un identifiant et mot de passe avec vérification de l'adresse email. Pour cela, nous mettons en oeuvre une authentification hébergée par [Auth0](https://auth0.com/docs). Cette authentification se base sur OAuth et délivre des Bearer tokens propres à chaque application, utilisateur. Elle intégre les permissions, les rôles par application ainsi que des metadata supplémentaires propre à l'utilisateur (SIRET de la société, identifiant unique, etc... )
+
 #### Authentification SSO GenApi&copy; 
-### Private Endpoints
-### Public Endpoints
-### Admin Endpoints
-### Web Site
-### Partenaires Endpoints
+GenApi &copy; (aka Septeo Notaires &copy;) est l'éditeur leader français du logiciel de rédaction d'actes pour des notaires. A ce jour, c'est le seul éditeur proposant un SSO d'authentification. Grâce à son SSO, l'utilisateur peut s'authentifier avec son identifant et mot de passe de son outil métier et permet de nous fournir un jeton d'authentification sur lequel nous nous baseons pour autoriser ou non l'accès à l'application SecureEchange. 
+
+#### Authentification par clé AVOCAT&reg; ou Certinomis&reg;
+A l'instar de la clé REAL&reg;, il existe d'autres dispositifs physiques de sécurité disponibles pour les autres professions. 
+En particulier, les avocats disposent d'une [clé d'authentification AVOCAT (anciennement e-barreau ou RPVA )](https://dl.avocatparis.org/ebarreau/doc/cle_avocat_V6_2021.pdf) qui peut être utilisée pour s'authentifier et signer électroniquement des documents avec une certification eIDAS. 
+Pour tous les professionnels qui ne sont ni Notaire ni Avocat, il est possible d'acquérir un dispositif physique de sécurité équivalent à la clé REAL&reg; ou AVOCAT&reg;, par exemple chez [Certinomis](https://www.certinomis.fr/produit/certinomis-decideur).
+L'usage de ces dispositifs de sécurité par l'utilisateur permet d'offrir un moyen fort d'authentification forte pour l'accès à l'application SecureEchange. 
+
+### API privées
+
+
+### API publics
+
+
+### API Admin
+
+### Site public et privée
+
+### Partenaires
+
 ### Interopérabilité Notariale
 
 # RGPD
