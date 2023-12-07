@@ -6,19 +6,16 @@
 
 
 # Sommaire
->Vue globale
+>Présentation
 >
->Architecture applicative
+>Architecture
 >- Services Authentification Endpoints
 >- Private Endpoints
 >- Public Endpoints
 >- Admin Endpoints
 >- Web Site
 >- Partenaires Endpoints
->
->Interopérabilité Notariale
->
->RGPD
+>- Interopérabilité Notariale
 >
 >Architecture Matériel
 >- Kubernetes
@@ -44,7 +41,7 @@
   >- Admin image
 >
 
-# Vue Globale
+# Présentation
 L'objectif de SecureEchange est de permettre, l'envoi et la réception de documents sensibles en assurant l'origine, l'intégrité et le suivi des actions des documents échangés.  
 Pour atteindre cet objectif, SecureEchange met en oeuvre plusieurs stratégies :
 - Authentification forte de l'office ou l'entreprise qui initie le transfère.
@@ -78,8 +75,44 @@ SecureEchange se compose des tiers suivants:
   - SMS MODE
   - Oodrive 
 
-## Architecture applicative
+## Architecture 
+<figure>
+<img src="/Documentation/images/macro-architecture.png"></img>
+<figcaption>Vue d'ensemble SecureEchange</figcaption>
+</figure>
+<figure>
+<img src="/Documentation/images//Secure-Echange-process.png"></img>
+<figcaption>Processus d'échanges bidirectionnel</figcaption>
+</figure>
+
+Comme on peut le comprendre depuis les schémas ci-dessus, SecureEchange doit interagir avec plusieurs acteurs:
+- Les utilisateurs de l'office ou de l'entreprise qui initient les échanges.
+- Le logiciel métier (LRA) dans lequel on trouve les fiches clients et les documents à envoyer mais aussi dans lequel on rangera les documents à recevoir
+- SMS Mode pour l'envoi de SMS dans le processus d'authentification à double facteur.
+- OODRIVE pour les demandes de signatures électroniques avancées eIDAS.
+- LexIA pour la reconnaissance et la vérification des RIBs.
+- La clé REAL qui permet une authentification forte grâce à un dispositif physique (clé USB) et code PIN. Et qui permet aussi la signature qualifiée eIDAS des documents PDF.
+- La clé Certigreffe qui permet une authentification forte grâce à une dispositif physique (clé USB) et code PIN. Et qui permet aussi la signature qualifiée eIDAS des documents PDF.
+- La clé Certinomis qui permet une authentitication forte grâce à un dispositif physique (clé USB) et code PIN. Et qui permet aussi la signature qualifiée eIDAS des documents PDF.
+- Le client final qui reçoit les documents envoyés et envoit ceux requis.
+
+Toutes ces interactions doivent s'effectuer de manière à **garantir l'intégrité, l'origine et le suivi des échanges**.  
+
+Afin d'atteindre ces objectifs, SecureEchange a été découpé en plusieurs parties :
+- Services d'authentification 
+- API privées réservées aux seuls utilisateurs de l'office ou l'entreprise.
+- API publiques réservés aux clients destinataires de l'échange.
+- L'interopérabilité notariale pour les informations des fiches clients, l'import et le rangement des documents échangés.
+- Une application Web réservée aux utilisateurs de l'Office ou l'entreprise
+- Une application Web réservée aux clients finaux.
+
+
 ### Services Authentification Endpoints
+#### Authentification par clé REAL
+La clé REAL est un dispositif physique sécurisée élaboré par l'ADSN et sous l'autorité du Conseil Supérieur du Notariat qui permet de signer les actes électroniques et s'authentifier pour diverses formalités.  Ce dispositif est disponible pour les notaires et pour les clercs bien que les rôles et permissions sont spécifiques à chaque acteur. Ce dispositif dépend  
+#### Authentification par clé Certigreffe ou Certinomis
+#### Authentification par Indentifiant et mot de passe (Auth0)
+#### Authentification SSO GenApi&copy; 
 ### Private Endpoints
 ### Public Endpoints
 ### Admin Endpoints
