@@ -118,88 +118,22 @@ Pour la publication de toutes nos API, nous avons choisi d'utiliser le modèle [
 #### API privées
 ##### Authentification
 Pour une authentification clé REAL, AVOCAT ou Certinomis
-> **[GET]  /api/clientcertificate**
-> Paramètres:
-> (query) service, (valeur par défaut) *SecureEchange*
-> Retours:
-> **(200) Success: 
-> {
-  "accessToken": "string", (SecureEchange Bearer Token)
-  "description": "string",
-  "expireAt": "2023-12-08T07:55:21.200Z",
-  "notBefore": "2023-12-08T07:55:21.200Z",
-  "issuedAt": "2023-12-08T07:55:21.200Z"
-> }**
-> (400) Bad Request:
-> (401) Unauthorized:
-> {
-  "type": "string",
-  "title": "string",
-  "status": 0,
-  "detail": "string",
-  "instance": "string",
-  "additionalProp1": "string",
-  "additionalProp2": "string",
-  "additionalProp3": "string"
-> }
+ | VERB | URI | Paramètres | Retour |
+ | ----- | ---- | -------| ---- |
+ | GET |  **/api/clientcertificate** |(query) service, (valeur par défaut) *SecureEchange* | **(200) Success:<br> {<br>  "accessToken": "string" (SecureEchange Bearer Token),<br>  "description": "string",<br>  "expireAt": "2023-12-08T07:55:21.200Z",<br>  "notBefore": "2023-12-08T07:55:21.200Z",<br>  "issuedAt": "2023-12-08T07:55:21.200Z"}**<br> <BR>(400) Bad Request:<BR>(401) Unauthorized| 
 
 Pour une authentification par identifiant et mot de passe (Auth0)
-> **[GET] /api/Auth0**
-> Parametres:
-> (query) service, (valeur par defaut) *SecureEchange*
-> (headers) (:exclamation:valeur requise:exclamation:) authorization: **Bearer Auth0_Access_Token** 
-> Retours
-> **(200) Success: 
-> {
-  "accessToken": "string", (SecureEchange Bearer Token)
-  "description": "string",
-  "expireAt": "2023-12-08T07:55:21.200Z",
-  "notBefore": "2023-12-08T07:55:21.200Z",
-  "issuedAt": "2023-12-08T07:55:21.200Z"
-> }**
-> (400) Bad Request:
-> (401) Unauthorized:
-> {
-  "type": "string",
-  "title": "string",
-  "status": 0,
-  "detail": "string",
-  "instance": "string",
-  "additionalProp1": "string",
-  "additionalProp2": "string",
-  "additionalProp3": "string"
-> }
+ | VERB | URI | Paramètres | Retour |
+ | ----- | ---- | -------| ---- |
+ |GET |  **/api/Auth0** |(query) service, (valeur par defaut) *SecureEchange* <br> (headers):exclamation: Authorization: **Bearer Auth0_Access_Token** | **(200) Success:<br> {"accessToken": "string", (SecureEchange Bearer Token)<br>  "description": "string",<br>  "expireAt": "2023-12-08T07:55:21.200Z", <br>  "notBefore": "2023-12-08T07:55:21.200Z",<br>  "issuedAt": "2023-12-08T07:55:21.200Z" <br> }** <br>(400) Bad Request<br> (401) Unauthorized |
 
 Pour une authentification avec un jeton SSO GenApi
-> **[GET] /api/iNotCloudAuth
-> Parametres:
-> (query) service, (valeur par defaut) *SecureEchange*
-> (headers) (:exclamation:valeur requise:exclamation:) authorization: **Bearer Genapi_Access_Token** 
-> Retours
-> **(200) Success: 
-> {
-  "accessToken": "string", (SecureEchange Bearer Token)
-  "description": "string",
-  "expireAt": "2023-12-08T07:55:21.200Z",
-  "notBefore": "2023-12-08T07:55:21.200Z",
-  "issuedAt": "2023-12-08T07:55:21.200Z"
-> }**
-> (400) Bad Request:
-> (401) Unauthorized:
-> {
-  "type": "string",
-  "title": "string",
-  "status": 0,
-  "detail": "string",
-  "instance": "string",
-  "additionalProp1": "string",
-  "additionalProp2": "string",
-  "additionalProp3": "string"
-> }
->  
+ | VERB | URI | Paramètres | Retour |
+ | ----- | ---- | -------| ---- |
+| GET | **/api/iNotCloudAuth** | (query) service, (valeur par defaut) *SecureEchange*<br> (headers):exclamation Authorization: **Bearer Genapi_Access_Token** | **(200) Success:<br>{<br> "accessToken": "string", <br>SecureEchange Bearer Token), <br>  "description": "string",<br>  "expireAt": "2023-12-08T07:55:21.200Z",<br>  "notBefore": "2023-12-08T07:55:21.200Z",<br>  "issuedAt": "2023-12-08T07:55:21.200Z"<br>}**<br><br>(400) Bad Request<br> (401) Unauthorized
 
 ##### Fonctionnel
-Toutes les API doivent obligatoirement respecter les régles par défaut suivantes :
+**Toutes les API doivent obligatoirement respecter les régles par défaut suivantes :**
 | Régle | Description | valeur |
 | ----- | -----| ---- |
 | Role obligatoire | Role défini dans le jeton SecureEchange  |  **member** |
@@ -208,63 +142,71 @@ Toutes les API doivent obligatoirement respecter les régles par défaut suivant
 
 Les roles, permissions sont contenues dans le jeton Access_Token SecureEchange généré par les API d'authentification. 
 >
-> 
-###### Share
-Cette API permet la création, modification, suppression et archivage des échanges par les utilisateurs authentifiés en tant membre d'une office ou entreprise existante et active. 
-Tous les échanges créés, sont automatiquement attachés à l'office ou l'entreprise. Tous les membres d'un office ou d'une entreprise ont accès aux échanges. Pas forcément à la clé de chiffrement des documents qui réside uniquement sur le poste de l'utilisateur qui a créé l'échange et dans le lien adressé au client final. 
-> 
-> [GET] /api/share
-> [GET] /api/share/{id}/audits
-> [GET] /api/share/{id}/file/{fileId}
-> [GET] /api/share/{id}
- 
+##### Liste des permissions 
+###### Permission spécifique pour la méthode Get
+| Régle | Description | valeur |
+ ----- | -----| ---- |
+|Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+
+###### Permission spécifique pour la méthode POST
+| Régle | Description | valeur |
+ ----- | -----| ---- |
+|Permission obligatoire | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
+
+###### Permission spécifique pour la méthode PUT
  | Régle | Description | valeur |
  | ----- | -----| ---- |
  | Permission obligatoire | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
- 
-> [POST] /api/share
-> [POST] /api/share/{id}/duplicate
-> [POST] /api/share/{id}/file
-> [POST] /api/share/{id}/file/required/file/{index}
-> [POST] /api/share/{id}/audits
- 
+
+ ###### Permission spécifique pour la méthode DELETE
  | Régle | Description | valeur |
  | ----- | -----| ---- |
  | Permission obligatoire | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
- 
-> [DELETE] /api/share/{id}
-> [DELETE] /api/share/{id}/file/{fileId}
-> [DELETE] /api/share/{id}/requiredfiles/{fileId}
+
+##### Share
+Cette API permet la création, la modification, la suppression et l'archivage des échanges par les utilisateurs authentifiés en tant membre d'une office ou entreprise existante et active. 
+Tous les échanges créés, sont automatiquement attachés à l'office ou l'entreprise. Tous les membres d'un office ou d'une entreprise ont accès aux échanges. Pas forcément à la clé de chiffrement des documents qui réside uniquement sur le poste de l'utilisateur qui a créé l'échange et dans le lien adressé au client final. 
+
+ | VERB | URI | Paramètres | Retour | Payload |
+ | ----- | ---- | -------| ---- | --- |
+| GET | /api/share | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| GET | /api/share/{id}/audits | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| GET | /api/share/{id}/file/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| GET | /api/share/{id} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| POST | /api/share ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| POST | /api/share/{id}/duplicate ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| POST | /api/share/{id}/file ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| POST | /api/share/{id}/file/required/file/{index} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| POST | /api/share/{id}/audits||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| DELETE | /api/share/{id}||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| DELETE | /api/share/{id}/file/{fileId}||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| DELETE | /api/share/{id}/requiredfiles/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
 
 ##### Vérification de la connexion
-> [GET] /api/Auth
-> Retour:
-> **(200) Success**:
-> { 
->    "name": "string",
->    "firstname": "string",
->    "lastname": "string",
->    "uniqueId": "string",
->    "companyCode": "string",
->    "companyTenant": "string",
->    "companyName": "string",
->    "email": "string",
->    "isCompanyCodeActive": true,
->    "properties": 
->>    [
->>>      {
->>>      "name": "string",
->>>      "description": "string",
->>>      "value": "string",
->>>      "isOptional": true
->>>      }
->>   ]
->}
-> (400) Bad Request:
-> (401) Unauthorized:
+ | VERB | URI | Paramètres | Retour | Payload |
+ | ----- | ---- | -------| ---- | --- |
+| GET | /api/Auth | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés principale de l'utilisateur connecté|
+
 ##### Companies
-> [GET] /api/companies/info
-> 
+
+ | VERB | URI | Paramètres | Retour | Payload |
+ | ----- | ---- | -------| ---- | --- |
+| GET | /api/companies/info | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Propriétés principales de l'office ou l'entreprise |
+| GET | /api/companies/Accounting/Credit | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Nb Crédits Signature |
+| PUT | /api/companies/info |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent le champs Propriétes peut-être mis à jour*|
+
+##### Members
+ VERB | URI | Paramètres | Retour | Payload |
+ ----- | ---- | -------| ---- | --- |
+ GET | /api/Members/self | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales de l'utilisateur connecté. |
+ PUT | /api/Members |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent les champs:<br>- Propriétes<br>- Firstname<br>- Lastname<br>- Email<br> Peuvent-être mis à jour.*|
+
+##### SecureEchange
+API de test
+ | VERB | URI | Paramètres | Retour | Payload |
+ | ----- | ---- | -------| ---- | --- |
+| GET | /api/SecureEchange | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales du jeton de l'utilisateur connecté.<br>- Siret/CRPCEN<br>- UniqueID<br>- Name<br>- Email<br>- Liste des rôles<br>- Liste des permissions<br>- IsSecureEchangeAdmin(V/F)<br>- Tenant |
+
 #### API publics
 
 #### API Admin
