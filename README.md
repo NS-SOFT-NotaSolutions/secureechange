@@ -71,27 +71,33 @@ Afin d'atteindre ces objectifs, SecureEchange a été découpé en plusieurs par
 - Une application Web réservée aux utilisateurs de l'Office ou l'entreprise
 - Une application Web réservée aux clients finaux.
 
+# Sécurisé par Design
+## Stratégie sécurité sur les rôles pour les Endpoints
+## Cycle de vie d'un jeton d'authentification
+## Liste de contrôles d'accès sur les entités
+### Denied
+### Granted
 
-### Les services Authentification
+# Les services Authentification
 
-#### Authentification par clé REAL
+## Authentification par clé REAL
 La clé REAL&reg; est un dispositif physique, sécurisée avec un code PIN et contenant un certificat de signature, élaboré par l'ADSN et sous l'autorité du Conseil Supérieur du Notariat qui permet de signer les actes électroniques et s'authentifier pour diverses formalités.  Ce dispositif est disponible pour les notaires et pour les clercs bien que les rôles et permissions soient spécifiques à chaque acteur. Ce dispositif dépend de l'autorité de certification Racine Notaires 20XX, cette autorité est qualifiée eIDAS. 
 Son utilisation dans le cadre de l'authentification des notaires et clercs permet une authentification forte des utilisateurs.  
 Cependant la profession, préfère que cette clé soit utilisée uniquement dans le cadre des signatures électroniques des actes et des formalités réglementaires. Son utilisation en tant que dispositif d'authentification pour les applications autres que celles réglementaires n'est pas préconisé ou encouragé.  
 
-#### Authentification par Identifiant et mot de passe (Auth0)
+## Authentification par Identifiant et mot de passe (Auth0)
 Pour tous les acteurs qui ne possèdent pas de dispositif sécurisé tel que la clé REAL&reg;, nous proposons une authentification basée sur un identifiant et mot de passe avec vérification de l'adresse email. Pour cela, nous mettons en oeuvre une authentification hébergée par [Auth0](https://auth0.com/docs). Cette authentification se base sur OAuth et délivre des Bearer tokens propres à chaque application, utilisateur. Elle intégre les permissions, les rôles par application ainsi que des metadata supplémentaires propre à l'utilisateur (SIRET de la société, identifiant unique, etc... )
 
-#### Authentification SSO GenApi&copy; 
+## Authentification SSO GenApi&copy; 
 GenApi &copy; (aka Septeo Notaires &copy;) est l'éditeur leader français du logiciel de rédaction d'actes pour des notaires. A ce jour, c'est le seul éditeur proposant un SSO d'authentification. Grâce à son SSO, l'utilisateur peut s'authentifier avec son identifant et mot de passe de son outil métier et permet de nous fournir un jeton d'authentification sur lequel nous nous baseons pour autoriser ou non l'accès à l'application SecureEchange. 
 
-#### Authentification par clé AVOCAT&reg; ou Certinomis&reg;
+## Authentification par clé AVOCAT&reg; ou Certinomis&reg;
 A l'instar de la clé REAL&reg;, il existe d'autres dispositifs physiques de sécurité disponibles pour les autres professions. 
 En particulier, les avocats disposent d'une [clé d'authentification AVOCAT (anciennement e-barreau ou RPVA )](https://dl.avocatparis.org/ebarreau/doc/cle_avocat_V6_2021.pdf) qui peut être utilisée pour s'authentifier et signer électroniquement des documents avec une certification eIDAS. 
 Pour tous les professionnels qui ne sont ni Notaire ni Avocat, il est possible d'acquérir un dispositif physique de sécurité équivalent à la clé REAL&reg; ou AVOCAT&reg;, par exemple chez [Certinomis](https://www.certinomis.fr/produit/certinomis-decideur).
 L'usage de ces dispositifs de sécurité par l'utilisateur permet d'offrir un moyen fort d'authentification forte pour l'accès à l'application SecureEchange. 
 
-### Les API
+# Les API
 [Les interfaces de programmation ou Application Programming Interfaces (API)](https://fr.wikipedia.org/wiki/Interface_de_programmation) définissent un ensemble de fonctionnalités indépendantes ou liées qui servent de façade par laquelle un système ou logiciel offre des services à d'autres logiciels.  Les services exposés font abstraction de la complexité de leur fonctionnement et des ressources qu'ils utilisent. Cela permet aux logiciels qui les consomment de se concentrer uniquement sur la fonctionnalité proposée tout en laissant traiter la compléxité aux API. 
 Exemple d'API :
 [Le modèle Document Object Model (DOM)](https://fr.wikipedia.org/wiki/Document_Object_Model) qui permet la manipulation des objets du document d'une page HTML contenue dans un navigateur. 
@@ -117,11 +123,11 @@ A ce découplage par domaine, il faut appliquer une répartition par acteur.
 Pour la publication de toutes nos API, nous avons choisi d'utiliser le modèle [Swagger RestFull respectant OpenApi V3](https://swagger.io/specification/). 
 
 ---
-#### API privées
+## API privées
 Gestion des accès à toutes les fonctionnalités des SecureEchange pour les utilisateurs, de l'office ou l'entreprise, authentifiés. 
 Chaque utilisateur authentifié, ne peut gérer que les SecureEchange de l'office ou l'entreprise dont il est un membre reconnu à la suite de son authentification.
 
-##### Authentification
+### Authentification
 Pour une authentification clé REAL, AVOCAT ou Certinomis
  Méthode | URI | Paramètres | Retour |
  ----- | ---- | -------| ---- |
@@ -137,7 +143,7 @@ Pour une authentification avec un jeton SSO GenApi
  | ----- | ---- | -------| ---- |
 |  <font color="blue">GET | **/api/iNotCloudAuth** | (query) service, (valeur par defaut) *SecureEchange*<br> (headers):exclamation: Authorization: **Bearer Genapi_Access_Token** | **(200) Success:<br>accessToken, <br>SecureEchange Bearer Token), <br>  description,<br>  expireAt,<br>  notBefore,<br>  issuedAt**<br><br>(400) Bad Request<br> (401) Unauthorized
 
-##### Fonctionnel
+### Fonctionnel
 **Toutes les API doivent obligatoirement respecter les régles par défaut suivantes :**
 | Régle | Description | valeur |
 | ----- | -----| ---- |
@@ -147,7 +153,7 @@ Pour une authentification avec un jeton SSO GenApi
 
 Les roles, permissions sont contenues dans le jeton Access_Token SecureEchange généré par les API d'authentification. 
 >
-##### Liste des permissions 
+#### Liste des permissions 
 | Méthode | Description | valeur |
  ----- | -----| ---- |
  <font color="blue">GET | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
@@ -155,7 +161,7 @@ Les roles, permissions sont contenues dans le jeton Access_Token SecureEchange g
 <font color="orange"> PUT | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
  <font color="red">DELETE</font> | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
 
-##### Share
+#### Share
 Cette API permet la création, la modification, la suppression et l'archivage des échanges par les utilisateurs authentifiés en tant membre d'une office ou entreprise existante et active. 
 Tous les échanges créés, sont automatiquement attachés à l'office ou l'entreprise. Tous les membres d'un office ou d'une entreprise ont accès aux échanges. Pas forcément à la clé de chiffrement des documents qui réside uniquement sur le poste de l'utilisateur qui a créé l'échange et dans le lien adressé au client final. 
 
@@ -174,12 +180,12 @@ Tous les échanges créés, sont automatiquement attachés à l'office ou l'entr
 | <font color="red">DELETE</font> | /api/share/{id}/file/{fileId}||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
 | <font color="red">DELETE</font> | /api/share/{id}/requiredfiles/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
 
-##### Vérification de la connexion
+#### Vérification de la connexion
  | Méthode | URI | Paramètres | Retour | Payload |
  | ----- | ---- | -------| ---- | --- |
 | <font color="blue">GET</font> | /api/Auth | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés principale de l'utilisateur connecté|
 
-##### Companies
+#### Companies
 
  | Méthode | URI | Paramètres | Retour | Payload |
  | ----- | ---- | -------| ---- | --- |
@@ -187,23 +193,35 @@ Tous les échanges créés, sont automatiquement attachés à l'office ou l'entr
 | <font color="blue">GET</font> | /api/companies/Accounting/Credit | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Nb Crédits Signature |
 | <font color="orange">PUT</font> | /api/companies/info |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent le champs Propriétes peut-être mis à jour*|
 
-##### Members
+#### Members
  Méthode | URI | Paramètres | Retour | Payload |
  ----- | ---- | -------| ---- | --- |
  <font color="blue">GET</font> | /api/Members/self | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales de l'utilisateur connecté. |
  <font color="orange">PUT</font> | /api/Members |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent les champs:<br>- Propriétes<br>- Firstname<br>- Lastname<br>- Email<br> Peuvent-être mis à jour.*|
 
-##### SecureEchange
+#### SecureEchange
 API de test du jeton Access Token SecureEchange
  | Méthode | URI | Paramètres | Retour | Payload |
  | ----- | ---- | -------| ---- | --- |
  | <font color="blue">GET</font> | /api/SecureEchange | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales du jeton de l'utilisateur connecté.<br>- Siret/CRPCEN<br>- UniqueID<br>- Name<br>- Email<br>- Liste des rôles<br>- Liste des permissions<br>- IsSecureEchangeAdmin(V/F)<br>- Tenant |
 
 ---
-#### API publics
+## API publics
 Gére les fonctionnalités d'un SecureEchange pour un client final. Le client finale ne peut que télécharger les documents transmis et téléverser et signer les documents requis.
+### Régles et Liste des permissions 
+**Toutes les appels à cette API (sauf ceux de PublicAuth) doivent obligatoirement respecter les régles suivantes :**
+| Régle | Description | valeur |
+| ----- | -----| ---- |
+| Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+| Headers obligatoires | Headers de la requête RestFull| **Authorization: Bearer [Access_Token]** |
 
-##### Authentification à double facteur 
+| Méthode | Description | valeur |
+| ----- | -----| ---- |
+| <font color="blue">GET</font> | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+| <font color="green">POST<font> | Permission défini dans le jeton SecureEchange | **create:secure_echange** |
+| <font color="orange">PUT</font> | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
+| <font color="red">DELETE</font> | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
+### Authentification à double facteur 
 Lorsque l'utilisateur de l'office ou l'entreprise a créé le SecureEchange, il a inscrit le client final en précisant l'adresse email, le numéro de téléphone et le type de canal de transmission du code de vérification :
 1. SMS
 1. Message vocal
@@ -220,7 +238,8 @@ Processus d'authentification du client final
 
 Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 
-##### PublicAuth
+### PublicAuth
+
 | Méthode | URI | Paramètres | Retour | Payload | Action |
 | ----- | ---- | -------| ---- | --- | --- |
 | <font color="blue">GET</font> | /publicAuth/{id}/SenderCompanyName |(route) id: idenfiant du SecureEchange |**(200) Success**:<br><br>(400) Bad Request<br> | Le nom de l'office ou l'entreprise|
@@ -229,21 +248,7 @@ Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 | <font color="blue">GET</font> | /publicAuth/{shareId}/email/sendotp/{method} | (route) shareID: identifiant SecureEchange<br>(route) email: Email validé<br>(route) Method: canal envoi du code SMS ou Vocal |**(204) No Content**:<br><br> (400) Bad Request<br>  (404) Not Found<br>||Envoi le code de vérification par la méthode choisie| 
 | <font color="blue">GET</font> |PublicAuth/{shareID}/{email}/verify/{otpPassword}|(route) shareId: identifiant SecureEchange<br>(route) email: email validé<br>(route) otpPassword: code à vérifier |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found| Retourne le jeton d'auhtentification  |Controle le code de vérification et si ok génére le jeton d'authentification  |
 
-##### Share
-**Toutes les appels à cette API doivent obligatoirement respecter les régles suivantes :**
-| Régle | Description | valeur |
-| ----- | -----| ---- |
-| Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
-| Headers obligatoires | Headers de la requête RestFull| **Authorization: Bearer [Access_Token]** |
-
-###### Liste des permissions 
-| Méthode | Description | valeur |
-| ----- | -----| ---- |
-| <font color="blue">GET</font> | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
-| <font color="green">POST<font> | Permission défini dans le jeton SecureEchange | **create:secure_echange** |
-| <font color="orange">PUT</font> | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
-| <font color="red">DELETE</font> | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
-
+### Share
 | Méthode | URI | Paramètres | Retour | Payload | Action |
 | ----- | ---- | -------| ---- | --- | --- |
 | <font color="blue">GET</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |les propriétés du SecureEchange| |
@@ -252,18 +257,17 @@ Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 | <font color="green">POST<font> | /share/{id}/file/{name}|(route) id: identifiant du SecureEchange<br>(route) name: catégorie du fichier à téléverser<br>(multipart) File |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |Téléverse le fichier joint| |
 | <font color="red">DELETE</font> | /share/{id}/file/{fileId} |(route) id: identifant du SecureEchange<br>(route) fileID: Identifiant du fichier requis à supprimer |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found | |
 
+---
+## API Admin
 
 ---
-#### API Admin
+## Site public et privée
 
 ---
-### Site public et privée
+## Partenaires
 
 ---
-### Partenaires
-
----
-### Interopérabilité Notariale
+## Interopérabilité Notariale
 
 ---
 # RGPD
@@ -271,14 +275,6 @@ Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 # Architecture Matériel
 ## Kubernetes
 ## Devops YAMLs
-
-# Sécurisé par Design
-
-## Stratégie sécurité sur les rôles pour les Endpoints
-## Liste de contrôles d'accès sur les entités
-### Permission Denied
-### Permission Granted
-## Cycle de vie d'un jeton d'authentification
 
 # Construction des images
 ## AUTH image
