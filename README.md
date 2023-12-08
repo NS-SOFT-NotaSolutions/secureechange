@@ -1,46 +1,11 @@
+
 ---
 # <img src="/Documentation/images/SecureEchange-165.png" width="40" height="40">SecureEchange &reg; 
 ### Envoyez et recevez vos documents en toute sécurité.
 
 ***[Présentation commerciale](https://www.notasolutions.fr/secure-echange/)***
 
-
-# Sommaire
->Présentation
->
->Architecture
->- Services Authentification 
->- API privés
->- API Publics
->- API Administration
->- Site web public et privé
->- Partenaires
->- Interopérabilité Notariale
->
->Architecture Matériel
->- Kubernetes
->- Devops YAMLs
->
->Sécurisé par Design
->- Stratégie sécurité sur les rôles pour les Endpoints
->- Liste de contrôles d'accès sur les entités
-  >- Permission Denied
-  >- Permission Granted
->
->Construction des images
->- Services d'authentification
-  >- Auth Image
-  >- REAL Image
->
->- APIs
-  >- Public API & Web Site Image (Production)
-  >- Public API & Web Site Image (Preproduction)
-  >- Internal APIs image
-  >
->- Services d'administration
-  >- Admin image
->
-
+---
 # Présentation
 L'objectif de SecureEchange est de permettre, l'envoi et la réception de documents sensibles en assurant l'origine, l'intégrité et le suivi des actions des documents échangés.  
 Pour atteindre cet objectif, SecureEchange met en oeuvre plusieurs stratégies :
@@ -126,13 +91,183 @@ En particulier, les avocats disposent d'une [clé d'authentification AVOCAT (anc
 Pour tous les professionnels qui ne sont ni Notaire ni Avocat, il est possible d'acquérir un dispositif physique de sécurité équivalent à la clé REAL&reg; ou AVOCAT&reg;, par exemple chez [Certinomis](https://www.certinomis.fr/produit/certinomis-decideur).
 L'usage de ces dispositifs de sécurité par l'utilisateur permet d'offrir un moyen fort d'authentification forte pour l'accès à l'application SecureEchange. 
 
-### API privées
+### Les API
+[Les interfaces de programmation ou Application Programming Interfaces (API)](https://fr.wikipedia.org/wiki/Interface_de_programmation) définissent un ensemble de fonctionnalités indépendantes ou liées qui servent de façade par laquelle un système ou logiciel offre des services à d'autres logiciels.  Les services exposés font abstraction de la complexité de leur fonctionnement et des ressources qu'ils utilisent. Cela permet aux logiciels qui les consomment de se concentrer uniquement sur la fonctionnalité proposée tout en laissant traiter la compléxité aux API. 
+Exemple d'API :
+[Le modèle Document Object Model (DOM)](https://fr.wikipedia.org/wiki/Document_Object_Model) qui permet la manipulation des objets du document d'une page HTML contenue dans un navigateur. 
+Exemple: [height (hauteur) et width (largeur)](https://developer.mozilla.org/fr/docs/Web/API/Document_Object_Model/Examples#exemple_1_height_hauteur_et_width_largeur)
 
+SecureEchange définit des API réparties en plusieurs domaines :
+- Authentification 
+  - Authentification à partir d'une clé REAL, AVOCAT ou Certinomis permet de générer un Bearer token SecureEchange
+  - Authentification à partir d'un token Auth0 permet de générer un Bearer Token SecureEchange
+  - Authentification à partir d'un token SSO GenApi permet de générer un Bearer Token SecureEchange
+- Fonctionnel
+  - Permet de gérer la création, la modification, le traitement et l'archivage des échanges. 
+  - la collecte et la restitution des suivi des traitements
+  - la gestion des crédits de Signature avancées 
+- Administration
+  - Permet de gérer la création, la modification, les commandes, la consommation des Offices ou entreprises clientes de SecureEchange
 
-### API publics
+A ce découplage par domaine, il faut appliquer une répartition par acteur. 
+- Utilisateur de l'office ou l'entreprise : un jeu d'**API privés**  donne accès à tous les foncationnalités pour gérer le cycle de vie des échanges.
+- Le client final: un jeu d'**API public**  donne accès à un nombre limité de fonctionnalités qui permettront la récupération des documents et la transmission des documents requis. 
+- Les opérateurs du site SecureEchange: un jeu d'**API d'administration** permet la création des offices ou entreprises, la prise en compte des commandes et crédits  de Signature, la gestion des utilisateurs et la remontés de statistiques comptables pour le suivi dans notre ERP. 
 
+Pour la publication de toutes nos API, nous avons choisi d'utiliser le modèle [Swagger RestFull respectant OpenApi V3](https://swagger.io/specification/). 
+#### API privées
+##### Authentification
+Pour une authentification clé REAL, AVOCAT ou Certinomis
+> **[GET]  /api/clientcertificate**
+> Paramètres:
+> (query) service, (valeur par défaut) *SecureEchange*
+> Retours:
+> **(200) Success: 
+> {
+  "accessToken": "string", (SecureEchange Bearer Token)
+  "description": "string",
+  "expireAt": "2023-12-08T07:55:21.200Z",
+  "notBefore": "2023-12-08T07:55:21.200Z",
+  "issuedAt": "2023-12-08T07:55:21.200Z"
+> }**
+> (400) Bad Request:
+> (401) Unauthorized:
+> {
+  "type": "string",
+  "title": "string",
+  "status": 0,
+  "detail": "string",
+  "instance": "string",
+  "additionalProp1": "string",
+  "additionalProp2": "string",
+  "additionalProp3": "string"
+> }
 
-### API Admin
+Pour une authentification par identifiant et mot de passe (Auth0)
+> **[GET] /api/Auth0**
+> Parametres:
+> (query) service, (valeur par defaut) *SecureEchange*
+> (headers) (:exclamation:valeur requise:exclamation:) authorization: **Bearer Auth0_Access_Token** 
+> Retours
+> **(200) Success: 
+> {
+  "accessToken": "string", (SecureEchange Bearer Token)
+  "description": "string",
+  "expireAt": "2023-12-08T07:55:21.200Z",
+  "notBefore": "2023-12-08T07:55:21.200Z",
+  "issuedAt": "2023-12-08T07:55:21.200Z"
+> }**
+> (400) Bad Request:
+> (401) Unauthorized:
+> {
+  "type": "string",
+  "title": "string",
+  "status": 0,
+  "detail": "string",
+  "instance": "string",
+  "additionalProp1": "string",
+  "additionalProp2": "string",
+  "additionalProp3": "string"
+> }
+
+Pour une authentification avec un jeton SSO GenApi
+> **[GET] /api/iNotCloudAuth
+> Parametres:
+> (query) service, (valeur par defaut) *SecureEchange*
+> (headers) (:exclamation:valeur requise:exclamation:) authorization: **Bearer Genapi_Access_Token** 
+> Retours
+> **(200) Success: 
+> {
+  "accessToken": "string", (SecureEchange Bearer Token)
+  "description": "string",
+  "expireAt": "2023-12-08T07:55:21.200Z",
+  "notBefore": "2023-12-08T07:55:21.200Z",
+  "issuedAt": "2023-12-08T07:55:21.200Z"
+> }**
+> (400) Bad Request:
+> (401) Unauthorized:
+> {
+  "type": "string",
+  "title": "string",
+  "status": 0,
+  "detail": "string",
+  "instance": "string",
+  "additionalProp1": "string",
+  "additionalProp2": "string",
+  "additionalProp3": "string"
+> }
+>  
+
+##### Fonctionnel
+Toutes les API doivent obligatoirement respecter les régles par défaut suivantes :
+| Régle | Description | valeur |
+| ----- | -----| ---- |
+| Role obligatoire | Role défini dans le jeton SecureEchange  |  **member** |
+| Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+| Parametres obligatoires | Headers de la requête RestFull| Authorization: **Bearer Access_Token** |
+
+Les roles, permissions sont contenues dans le jeton Access_Token SecureEchange généré par les API d'authentification. 
+>
+> 
+###### Share
+Cette API permet la création, modification, suppression et archivage des échanges par les utilisateurs authentifiés en tant membre d'une office ou entreprise existante et active. 
+Tous les échanges créés, sont automatiquement attachés à l'office ou l'entreprise. Tous les membres d'un office ou d'une entreprise ont accès aux échanges. Pas forcément à la clé de chiffrement des documents qui réside uniquement sur le poste de l'utilisateur qui a créé l'échange et dans le lien adressé au client final. 
+> 
+> [GET] /api/share
+> [GET] /api/share/{id}/audits
+> [GET] /api/share/{id}/file/{fileId}
+> [GET] /api/share/{id}
+ 
+ | Régle | Description | valeur |
+ | ----- | -----| ---- |
+ | Permission obligatoire | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
+ 
+> [POST] /api/share
+> [POST] /api/share/{id}/duplicate
+> [POST] /api/share/{id}/file
+> [POST] /api/share/{id}/file/required/file/{index}
+> [POST] /api/share/{id}/audits
+ 
+ | Régle | Description | valeur |
+ | ----- | -----| ---- |
+ | Permission obligatoire | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
+ 
+> [DELETE] /api/share/{id}
+> [DELETE] /api/share/{id}/file/{fileId}
+> [DELETE] /api/share/{id}/requiredfiles/{fileId}
+
+##### Vérification de la connexion
+> [GET] /api/Auth
+> Retour:
+> **(200) Success**:
+> { 
+>    "name": "string",
+>    "firstname": "string",
+>    "lastname": "string",
+>    "uniqueId": "string",
+>    "companyCode": "string",
+>    "companyTenant": "string",
+>    "companyName": "string",
+>    "email": "string",
+>    "isCompanyCodeActive": true,
+>    "properties": 
+>>    [
+>>>      {
+>>>      "name": "string",
+>>>      "description": "string",
+>>>      "value": "string",
+>>>      "isOptional": true
+>>>      }
+>>   ]
+>}
+> (400) Bad Request:
+> (401) Unauthorized:
+##### Companies
+> [GET] /api/companies/info
+> 
+#### API publics
+
+#### API Admin
 
 ### Site public et privée
 
