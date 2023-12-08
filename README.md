@@ -110,27 +110,32 @@ SecureEchange définit des API réparties en plusieurs domaines :
   - Permet de gérer la création, la modification, les commandes, la consommation des Offices ou entreprises clientes de SecureEchange
 
 A ce découplage par domaine, il faut appliquer une répartition par acteur. 
-- Utilisateur de l'office ou l'entreprise : un jeu d'**API privés**  donne accès à tous les foncationnalités pour gérer le cycle de vie des échanges.
+- Utilisateur de l'office ou l'entreprise : un jeu d'**API privés**  donne accès à toutes les fonctionnalités pour gérer le cycle de vie des échanges.
 - Le client final: un jeu d'**API public**  donne accès à un nombre limité de fonctionnalités qui permettront la récupération des documents et la transmission des documents requis. 
 - Les opérateurs du site SecureEchange: un jeu d'**API d'administration** permet la création des offices ou entreprises, la prise en compte des commandes et crédits  de Signature, la gestion des utilisateurs et la remontés de statistiques comptables pour le suivi dans notre ERP. 
 
 Pour la publication de toutes nos API, nous avons choisi d'utiliser le modèle [Swagger RestFull respectant OpenApi V3](https://swagger.io/specification/). 
+
+---
 #### API privées
+Gestion des accès à toutes les fonctionnalités des SecureEchange pour les utilisateurs, de l'office ou l'entreprise, authentifiés. 
+Chaque utilisateur authentifié, ne peut gérer que les SecureEchange de l'office ou l'entreprise dont il est un membre reconnu à la suite de son authentification.
+
 ##### Authentification
 Pour une authentification clé REAL, AVOCAT ou Certinomis
- | VERB | URI | Paramètres | Retour |
- | ----- | ---- | -------| ---- |
- | GET |  **/api/clientcertificate** |(query) service, (valeur par défaut) *SecureEchange* | **(200) Success:<br> {<br>  "accessToken": "string" (SecureEchange Bearer Token),<br>  "description": "string",<br>  "expireAt": "2023-12-08T07:55:21.200Z",<br>  "notBefore": "2023-12-08T07:55:21.200Z",<br>  "issuedAt": "2023-12-08T07:55:21.200Z"}**<br> <BR>(400) Bad Request:<BR>(401) Unauthorized| 
+ Méthode | URI | Paramètres | Retour |
+ ----- | ---- | -------| ---- |
+  <font color="blue">GET |  **/api/clientcertificate** |(query) service, (valeur par défaut) *SecureEchange*<br>**Client Certificate validé par code pin** | **(200) Success:<br> accessToken (SecureEchange Bearer Token),<br>  description,<br>  expireAt,<br>  notBefore,<br>  issuedAt**<br> <BR>(400) Bad Request:<BR>(401) Unauthorized| 
 
 Pour une authentification par identifiant et mot de passe (Auth0)
- | VERB | URI | Paramètres | Retour |
- | ----- | ---- | -------| ---- |
- |GET |  **/api/Auth0** |(query) service, (valeur par defaut) *SecureEchange* <br> (headers):exclamation: Authorization: **Bearer Auth0_Access_Token** | **(200) Success:<br> {"accessToken": "string", (SecureEchange Bearer Token)<br>  "description": "string",<br>  "expireAt": "2023-12-08T07:55:21.200Z", <br>  "notBefore": "2023-12-08T07:55:21.200Z",<br>  "issuedAt": "2023-12-08T07:55:21.200Z" <br> }** <br>(400) Bad Request<br> (401) Unauthorized |
+ Méthode | URI | Paramètres | Retour |
+ ----- | ---- | -------| ---- |
+  <font color="blue">GET |  **/api/Auth0** |(query) service, (valeur par defaut) *SecureEchange* <br> (headers):exclamation: Authorization: **Bearer Auth0_Access_Token** | **(200) Success:<br>accessToken, (SecureEchange Bearer Token)<br>  description,<br>  expireAt, <br>  notBefore,<br>  issuedAt**<br><br>(400) Bad Request<br> (401) Unauthorized |
 
 Pour une authentification avec un jeton SSO GenApi
- | VERB | URI | Paramètres | Retour |
+ | Méthode | URI | Paramètres | Retour |
  | ----- | ---- | -------| ---- |
-| GET | **/api/iNotCloudAuth** | (query) service, (valeur par defaut) *SecureEchange*<br> (headers):exclamation Authorization: **Bearer Genapi_Access_Token** | **(200) Success:<br>{<br> "accessToken": "string", <br>SecureEchange Bearer Token), <br>  "description": "string",<br>  "expireAt": "2023-12-08T07:55:21.200Z",<br>  "notBefore": "2023-12-08T07:55:21.200Z",<br>  "issuedAt": "2023-12-08T07:55:21.200Z"<br>}**<br><br>(400) Bad Request<br> (401) Unauthorized
+|  <font color="blue">GET | **/api/iNotCloudAuth** | (query) service, (valeur par defaut) *SecureEchange*<br> (headers):exclamation: Authorization: **Bearer Genapi_Access_Token** | **(200) Success:<br>accessToken, <br>SecureEchange Bearer Token), <br>  description,<br>  expireAt,<br>  notBefore,<br>  issuedAt**<br><br>(400) Bad Request<br> (401) Unauthorized
 
 ##### Fonctionnel
 **Toutes les API doivent obligatoirement respecter les régles par défaut suivantes :**
@@ -138,85 +143,129 @@ Pour une authentification avec un jeton SSO GenApi
 | ----- | -----| ---- |
 | Role obligatoire | Role défini dans le jeton SecureEchange  |  **member** |
 | Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
-| Parametres obligatoires | Headers de la requête RestFull| Authorization: **Bearer Access_Token** |
+| Headers obligatoires | Headers de la requête RestFull| **Authorization: Bearer [Access_Token]** |
 
 Les roles, permissions sont contenues dans le jeton Access_Token SecureEchange généré par les API d'authentification. 
 >
 ##### Liste des permissions 
-###### Permission spécifique pour la méthode Get
-| Régle | Description | valeur |
+| Méthode | Description | valeur |
  ----- | -----| ---- |
-|Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
-
-###### Permission spécifique pour la méthode POST
-| Régle | Description | valeur |
- ----- | -----| ---- |
-|Permission obligatoire | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
-
-###### Permission spécifique pour la méthode PUT
- | Régle | Description | valeur |
- | ----- | -----| ---- |
- | Permission obligatoire | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
-
- ###### Permission spécifique pour la méthode DELETE
- | Régle | Description | valeur |
- | ----- | -----| ---- |
- | Permission obligatoire | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
+ <font color="blue">GET | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+ <font color="green">POST | Permission défini dans le jeton SecureEchange | **create:secure_echange** |
+<font color="orange"> PUT | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
+ <font color="red">DELETE</font> | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
 
 ##### Share
 Cette API permet la création, la modification, la suppression et l'archivage des échanges par les utilisateurs authentifiés en tant membre d'une office ou entreprise existante et active. 
 Tous les échanges créés, sont automatiquement attachés à l'office ou l'entreprise. Tous les membres d'un office ou d'une entreprise ont accès aux échanges. Pas forcément à la clé de chiffrement des documents qui réside uniquement sur le poste de l'utilisateur qui a créé l'échange et dans le lien adressé au client final. 
 
- | VERB | URI | Paramètres | Retour | Payload |
+ | Méthode | URI | Paramètres | Retour | Payload |
  | ----- | ---- | -------| ---- | --- |
-| GET | /api/share | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| GET | /api/share/{id}/audits | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| GET | /api/share/{id}/file/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| GET | /api/share/{id} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| POST | /api/share ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| POST | /api/share/{id}/duplicate ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| POST | /api/share/{id}/file ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| POST | /api/share/{id}/file/required/file/{index} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| POST | /api/share/{id}/audits||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| DELETE | /api/share/{id}||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| DELETE | /api/share/{id}/file/{fileId}||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
-| DELETE | /api/share/{id}/requiredfiles/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="blue">GET</font> | /api/share | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="blue">GET</font> | /api/share/{id}/audits | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="blue">GET</font> | /api/share/{id}/file/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="blue">GET</font> | /api/share/{id} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="green">POST</font> | /api/share ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="green">POST</font> | /api/share/{id}/duplicate ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="green">POST</font> | /api/share/{id}/file ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="green">POST</font> | /api/share/{id}/file/required/file/{index} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="green">POST</font> | /api/share/{id}/audits||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="red">DELETE</font> | /api/share/{id}||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="red">DELETE</font> | /api/share/{id}/file/{fileId}||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="red">DELETE</font> | /api/share/{id}/requiredfiles/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
 
 ##### Vérification de la connexion
- | VERB | URI | Paramètres | Retour | Payload |
+ | Méthode | URI | Paramètres | Retour | Payload |
  | ----- | ---- | -------| ---- | --- |
-| GET | /api/Auth | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés principale de l'utilisateur connecté|
+| <font color="blue">GET</font> | /api/Auth | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés principale de l'utilisateur connecté|
 
 ##### Companies
 
- | VERB | URI | Paramètres | Retour | Payload |
+ | Méthode | URI | Paramètres | Retour | Payload |
  | ----- | ---- | -------| ---- | --- |
-| GET | /api/companies/info | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Propriétés principales de l'office ou l'entreprise |
-| GET | /api/companies/Accounting/Credit | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Nb Crédits Signature |
-| PUT | /api/companies/info |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent le champs Propriétes peut-être mis à jour*|
+| <font color="blue">GET</font> | /api/companies/info | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Propriétés principales de l'office ou l'entreprise |
+| <font color="blue">GET</font> | /api/companies/Accounting/Credit | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Nb Crédits Signature |
+| <font color="orange">PUT</font> | /api/companies/info |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent le champs Propriétes peut-être mis à jour*|
 
 ##### Members
- VERB | URI | Paramètres | Retour | Payload |
+ Méthode | URI | Paramètres | Retour | Payload |
  ----- | ---- | -------| ---- | --- |
- GET | /api/Members/self | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales de l'utilisateur connecté. |
- PUT | /api/Members |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent les champs:<br>- Propriétes<br>- Firstname<br>- Lastname<br>- Email<br> Peuvent-être mis à jour.*|
+ <font color="blue">GET</font> | /api/Members/self | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales de l'utilisateur connecté. |
+ <font color="orange">PUT</font> | /api/Members |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent les champs:<br>- Propriétes<br>- Firstname<br>- Lastname<br>- Email<br> Peuvent-être mis à jour.*|
 
 ##### SecureEchange
-API de test
- | VERB | URI | Paramètres | Retour | Payload |
+API de test du jeton Access Token SecureEchange
+ | Méthode | URI | Paramètres | Retour | Payload |
  | ----- | ---- | -------| ---- | --- |
-| GET | /api/SecureEchange | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales du jeton de l'utilisateur connecté.<br>- Siret/CRPCEN<br>- UniqueID<br>- Name<br>- Email<br>- Liste des rôles<br>- Liste des permissions<br>- IsSecureEchangeAdmin(V/F)<br>- Tenant |
+ | <font color="blue">GET</font> | /api/SecureEchange | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales du jeton de l'utilisateur connecté.<br>- Siret/CRPCEN<br>- UniqueID<br>- Name<br>- Email<br>- Liste des rôles<br>- Liste des permissions<br>- IsSecureEchangeAdmin(V/F)<br>- Tenant |
 
+---
 #### API publics
+Gére les fonctionnalités d'un SecureEchange pour un client final. Le client finale ne peut que télécharger les documents transmis et téléverser et signer les documents requis.
 
+##### Authentification à double facteur 
+Lorsque l'utilisateur de l'office ou l'entreprise a créé le SecureEchange, il a inscrit le client final en précisant l'adresse email, le numéro de téléphone et le type de canal de transmission du code de vérification :
+1. SMS
+1. Message vocal
+
+Processus d'authentification du client final
+1. Le client clique sur le lien qu'il a reçu dans sa boite à lettre
+2. Dans la page d'authentification, il doit saisir son adresse email
+3. Vérification de l'adresse email saisie :
+   1. L'adresse email ne fait pas partie des destinataires, on retourne un Unauthorized
+4. L'adresse email a été validé, le client peut recevoir un code en fonction du canal choisi et du numéro de téléphone saisis par l'utilisateur de l'office ou l'entreprise
+5. Le client doit saisir le code envoyé sur le numéro de téléphone soit par SMS soit en message vocal.
+   1. Le code n'est pas le bon, on retourne Unauthorized
+6. Le code est validé, le client final accède à son SecureEchange.
+
+Les API qui permettent de prendre en charge ce processus sont PublicAuth.
+
+##### PublicAuth
+| Méthode | URI | Paramètres | Retour | Payload | Action |
+| ----- | ---- | -------| ---- | --- | --- |
+| <font color="blue">GET</font> | /publicAuth/{id}/SenderCompanyName |(route) id: idenfiant du SecureEchange |**(200) Success**:<br><br>(400) Bad Request<br> | Le nom de l'office ou l'entreprise|
+| <font color="blue">GET</font> | /publicAuth/{shareId} | (route) shareId: identifiant du SecureEchange |**(204) No content**:<br><br> (400) Bad Request<br> (404) Not Found<br>| | Vérifie que le SecureEchange existe et n'est pas expiré. |
+| <font color="blue">GET</font> | /publicAuth/{shareId}/{email} | (route) shareId: identifiant du SecureEchange <br>(route) email: email à tester pour ce destinataire |**(200) Success**:<br><br> (400) Bad Request<br> (404) Not Found<br> |Retourne les éléments pour passer à l'étape 2  | Vérification de l'adresse email |
+| <font color="blue">GET</font> | /publicAuth/{shareId}/email/sendotp/{method} | (route) shareID: identifiant SecureEchange<br>(route) email: Email validé<br>(route) Method: canal envoi du code SMS ou Vocal |**(204) No Content**:<br><br> (400) Bad Request<br>  (404) Not Found<br>||Envoi le code de vérification par la méthode choisie| 
+| <font color="blue">GET</font> |PublicAuth/{shareID}/{email}/verify/{otpPassword}|(route) shareId: identifiant SecureEchange<br>(route) email: email validé<br>(route) otpPassword: code à vérifier |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found| Retourne le jeton d'auhtentification  |Controle le code de vérification et si ok génére le jeton d'authentification  |
+
+##### Share
+**Toutes les appels à cette API doivent obligatoirement respecter les régles suivantes :**
+| Régle | Description | valeur |
+| ----- | -----| ---- |
+| Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+| Headers obligatoires | Headers de la requête RestFull| **Authorization: Bearer [Access_Token]** |
+
+###### Liste des permissions 
+| Méthode | Description | valeur |
+| ----- | -----| ---- |
+| <font color="blue">GET</font> | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+| <font color="green">POST<font> | Permission défini dans le jeton SecureEchange | **create:secure_echange** |
+| <font color="orange">PUT</font> | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
+| <font color="red">DELETE</font> | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
+
+| Méthode | URI | Paramètres | Retour | Payload | Action |
+| ----- | ---- | -------| ---- | --- | --- |
+| <font color="blue">GET</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |les propriétés du SecureEchange| |
+| <font color="blue">GET</font> | /share/{id}/file/{fileId} |(route)id: identifiant du SecureEchange<br>(route) fileId: identifiant du fichier à télécharger| **(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|Le fichier encrypté||
+| <font color="green">POST</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|Modifie unique le status du SecureEchange  | |
+| <font color="green">POST<font> | /share/{id}/file/{name}|(route) id: identifiant du SecureEchange<br>(route) name: catégorie du fichier à téléverser<br>(multipart) File |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |Téléverse le fichier joint| |
+| <font color="red">DELETE</font> | /share/{id}/file/{fileId} |(route) id: identifant du SecureEchange<br>(route) fileID: Identifiant du fichier requis à supprimer |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found | |
+
+
+---
 #### API Admin
 
+---
 ### Site public et privée
 
+---
 ### Partenaires
 
+---
 ### Interopérabilité Notariale
 
+---
 # RGPD
 
 # Architecture Matériel
