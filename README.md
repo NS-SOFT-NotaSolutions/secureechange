@@ -26,7 +26,7 @@ SecureEchange se compose des tiers suivants:
   - Interopérabilité Notariale (Office notarial)
   - Outlook
 
--Poste de Travail du client final
+- Poste de Travail du client final
   - PC:  Edge ou Chrome ou Firefox
   - Mobile: Safari, Chrome
 
@@ -72,11 +72,11 @@ Afin d'atteindre ces objectifs, SecureEchange a été découpé en plusieurs par
 - Une application Web réservée aux clients finaux.
 
 # Sécurisé par Design
-## Stratégie sécurité sur les rôles pour les Endpoints
+## Stratégie sécurité sur les rôles et permissions pour les API
 ## Cycle de vie d'un jeton d'authentification
 ## Liste de contrôles d'accès sur les entités
-### Denied
-### Granted
+- ### Denied
+- ### Granted
 
 # Les services Authentification
 
@@ -259,6 +259,71 @@ Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 
 ---
 ## API Admin
+
+Cette API permet d'effectuer l'administration de l'application. 
+Celle-ci consiste à :
+- Création et/ou modification d'office ou d'entreprise
+- Prise en compte de commandes de Crédits de Signature
+- Activation/Désactivation d'un office ou une entreprise
+- Edition de rapports
+  - Consommation de Signatures
+  - Liste des Membres connectés
+  - Liste des SecureEchange par office ou entreprise
+
+Cette administration est, à ce jour, réservée au seul personnel de NS SOFT qui a accès à l'ensemble des fonctionnalités et de tous les abonnés (office ou entreprise).
+
+Pour y avoir accès, il faut impérativement présenter un jeton Access_Token Auth0 contenant un des rôles :
+- SecureEchangeAdmin
+- SecureEchangeOperator
+
+### Régles
+**Toutes les appels à cette API doivent obligatoirement respecter les régles suivantes :**
+| Régle | Description | valeur |
+| ----- | -----| ---- |
+| Permission obligatoire | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+| Headers obligatoires | Headers de la requête RestFull| **Authorization: Bearer [Access_Token]** |
+| Headers obligatoires | Headers de la requête RestFull| **x-api-key** |
+| Headers obligatoires | Headers de la requête RestFull| **application-id** |
+| Rôle obligatoire | Role défini dans le jeton SecureEchange | **SecureEchangeAdmin**<br>ou<br>**SecureEchangeOperator** |
+| Validation | L'email du compte doit avoir été validé par Auth0 | **Email Validated** |
+
+### Liste des permissions 
+| Méthode | Description | valeur |
+ ----- | -----| ---- |
+ <font color="blue">GET | Permission défini dans le jeton SecureEchange | **read:secure_echange** |
+ <font color="green">POST | Permission défini dans le jeton SecureEchange | **create:secure_echange** |
+<font color="orange"> PUT | Permission défini dans le jeton SecureEchange | **write:secure_echange** |
+ <font color="red">DELETE</font> | Permission défini dans le jeton SecureEchange | **delete:secure_echange** |
+
+### Authentification
+Il faut impérativement disposer d'un compte identifiant et mot de passe Auth0. Seul NS SOFT peut créer ce compte.  
+Seuls les comptes Auth0 ont accès à l'administration de l'application. 
+
+### Admin
+
+| Méthode | URI | Paramètres | Retour | Payload | Action |
+| ----- | ---- | -------| ---- | --- | --- |
+| <font color="blue">GET</font> | /api/Admin |(Headers) Auth0 **Access_Token**|**(200) Success**:<br><br>(401) Unauthorized ||Vérifie que l'utilisateur est autorisé à se connecter|
+| <font color="blue">GET</font> | /api/Admin/whoiam |(Headers) Auth0 **Access_Token**|**(200) Success**:<br><br>(401) Unauthorized |Retour les informations suivantes en fonction de l'utilisateur connecté et autorisé<br>**Name<br>Email<br>UniqueId<br>Client<br>CompanyCode** ||
+| <font color="blue">GET</font> | /api/Admin/orders |(Headers) Auth0 **Access_Token**|**(200) Success**:<br><br> Unauthorized|La liste de **toutes les commandes trouvées**||
+| <font color="green">POST</font> | /api/Admin/orders |(Headers) Auth0 **Access_Token**<br>(body) **Commande**|**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized|Nouvelle commande|Ajoute une nouvelle commande|
+| <font color="orange">PUT</font> | /api/Admin/orders |(Headers) Auth0 **Access_Token**<br>(body) **commande** |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized|Commande modifiée| Modifie une commande existante|
+| <font color="blue">GET</font> | /api/Admin/orders/companies/{companyId} |(Headers) Auth0 **Access_Token**<br>(route) **companyId**: identifiant de la company|**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|La liste des commandes de la compagnie référencée par son id||
+| <font color="blue">GET</font> | /api/Admin/orders/{id} | (Headers)Auth0 **Access_Token**<br>(route) **id**: identifiant de la commande |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized|Le détail de la commande référencée par son id ||
+| <font color="red">DELETE</font> | /api/Admin/orders/{id} | (Headers)Auth0 **Access_Token**<br>(route) **id**: identifiant de la commande |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized||Supprime la commande référencée par son id|
+| <font color="blue">GET</font> | /api/Admin/articles | (Headers)Auth0 **Access_Token** |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized|La liste de tous les articles disponibles||
+| <font color="blue">GET</font> | /api/Admin/companies |(Headers)Auth0 **Access_Token** |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized| La liste de toutes les compagnies abonnées actives ou non || 
+| <font color="green">POST</font> | /api/Admin/companies | (Headers)Auth0 **Access_Token**<br>(body) **Nouvelle compagnie** |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized|La nouvelle compagnie créée||
+| <font color="orange">PUT</font> | /api/Admin/companies | (Headers)Auth0 **Access_Token**<br>(body) **Compagnie à modifier** |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized| Compagnie modifiée||
+| <font color="blue">GET</font> | /api/Admin/companies/search | (Headers) Auth0 **Access_Token**<br>(query) **criteria**: chaine à rechercher<br>(query) **skip**: nombre d'enregistrement à sauter<br>(query) **top**: nombre d'enregistrement à retourner<br>(query) **isVendor**: filtre sur les compagnies de type fournisseur<br>(query) **deleted**: filtre sur les compagnie marquée en suppression<br>(query) **status**: filtre sur le status Active ou Inactive |**(200) Success**:<br><br> (401) Unauthorized <br>(404) Not Found|La liste des compagnies répondant aux critères de la recherche ||
+| <font color="blue">GET</font> | /api/Admin/companies/{id} | (Headers)Auth0 **Access_Token**<br>(route) **id**: identifiant de la compagnie |**(200) Success**:<br><br> (401) Unauthorized <br>(404) Not Found|La compagnie référencée par son id||
+| <font color="blue">GET</font> | /api/Admin/companies/{id}/members | (Headers)Auth0 **Access_Token**<br>(route) **id**: identifiant de la compagnie |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|La liste de tous les membres de la compagnie référencée par son id||
+| <font color="blue">GET</font> | /api/Admin/companies/siret/{id} | (Headers)Auth0 **Access_Token**<br>(route) **id**: siret de la compagnie |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|La compagnie dont le siret est id||
+| <font color="green">POST</font> | /api/Admin/companies/import | (Headers)Auth0 **Access_Token**<br>(multipart) **csvFile**: fichier au format CSV |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized|Retourne la liste des compagnies| Ajoute en masse des compagnies décrites dans le fichier CSV ci-attaché|
+| <font color="blue">GET</font> | /api/Admin/companies/{id}/Accounting/Credit | (Headers)Auth0 **Access_Token**<br>(route) **id**: identifiant de la compagnie  |**(200) Success**:<br><br> (401) Unauthorized|Le crédit de signature restant de la compagnie référencée par son identifiant||
+| <font color="blue">GET</font> | /api/Admin/companies/{id}/Accounting/Debit | (Headers)Auth0 **Access_Token**<br>(route) **id**: identifiant de la compagnie   |**(200) Success**:<br><br> (401) Unauthorized|La somme des débits de Crédits de Signatures de la compagnie référencée par son id||
+| <font color="blue">GET</font> | /api/Admin/companies/{id}/Accounting/Balance | (Headers)Auth0 **Access_Token**<br>(route) **id**: identifiant de la compagnie   |**(200) Success**:<br><br>Unauthorized|La somme des crédits de Crédits de Signature de la compagnie référencée par son id||
+
 
 ---
 ## Site public et privée
