@@ -197,7 +197,7 @@ Tous les échanges créés, sont automatiquement attachés à l'office ou l'entr
 | Méthode | URI | Paramètres | Retour | Payload |
 | ----- | ---- | -------| ---- | --- |
 | <font color="blue">GET</font> | /api/Members/self | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales de l'utilisateur connecté. |
-| <font color="orange">PUT</font> | /api/Members |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent les champs:<br> Propriétes<br>- Firstname<br> Lastname<br> Email<br> Peuvent-être mis à jour*|
+| <font color="orange">PUT</font> | /api/Members |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>:memo: *Uniquemenent les champs:<br> Propriétes<br>Firstname<br>Lastname<br>Email<br>peuvent-être mis à jour.*|
 
 #### SecureEchange
 API de test du jeton Access Token SecureEchange
@@ -240,13 +240,51 @@ Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 
 ### PublicAuth
 
+
 | Méthode | URI | Paramètres | Retour | Payload | Action |
 | ----- | ---- | -------| ---- | --- | --- |
 | <font color="blue">GET</font> | /publicAuth/{id}/SenderCompanyName |(route) id: idenfiant du SecureEchange |**(200) Success**:<br><br>(400) Bad Request<br> | Le nom de l'office ou l'entreprise|
 | <font color="blue">GET</font> | /publicAuth/{shareId} | (route) shareId: identifiant du SecureEchange |**(204) No content**:<br><br> (400) Bad Request<br> (404) Not Found<br>| | Vérifie que le SecureEchange existe et n'est pas expiré. |
-| <font color="blue">GET</font> | /publicAuth/{shareId}/{email} | (route) shareId: identifiant du SecureEchange <br>(route) email: email à tester pour ce destinataire |**(200) Success**:<br><br> (400) Bad Request<br> (404) Not Found<br> |Retourne les éléments pour passer à l'étape 2  | Vérification de l'adresse email |
-| <font color="blue">GET</font> | /publicAuth/{shareId}/email/sendotp/{method} | (route) shareID: identifiant SecureEchange<br>(route) email: Email validé<br>(route) Method: canal envoi du code SMS ou Vocal |**(204) No Content**:<br><br> (400) Bad Request<br>  (404) Not Found<br>||Envoi le code de vérification par la méthode choisie| 
-| <font color="blue">GET</font> |PublicAuth/{shareID}/{email}/verify/{otpPassword}|(route) shareId: identifiant SecureEchange<br>(route) email: email validé<br>(route) otpPassword: code à vérifier |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found| Retourne le jeton d'auhtentification  |Controle le code de vérification et si ok génére le jeton d'authentification  |
+| <font color="blue">GET</font> | /publicAuth/{shareId}/{email} | (route) shareId: identifiant du SecureEchange <br>(route) email: email à tester pour ce destinataire |**(200) Success**:<br><br> (400) Bad Request<br> (404) Not Found<br> (429) Too many requests|Retourne les éléments pour passer à l'étape 2  | Vérification de l'adresse email |
+| <font color="blue">GET</font> | /publicAuth/{shareId}/{email}/sendotp/{method} | (route) shareID: identifiant SecureEchange<br>(route) email: Email validé<br>(route) Method: canal envoi du code SMS ou Vocal |**(204) No Content**:<br><br> (400) Bad Request<br>  (404) Not Found<br>||Envoi le code de vérification par la méthode choisie| 
+| <font color="blue">GET</font> |PublicAuth/{shareID}/{email}/verify/{otpPassword}|(route) shareId: identifiant SecureEchange<br>(route) email: email validé<br>(route) otpPassword: code à vérifier |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found<br> (429) Too many requests| Retourne le jeton d'auhtentification  |Controle le code de vérification et si ok génére le jeton d'authentification  |
+
+#### Risques identifiés
+##### Brute force Email
+Le point d'entrée: 
+```
+/PublicAuth/{shareId}/{email} 
+```
+peut être utilisé dans une attaque de type brute force pour découvrir les adresses emails destinataires du SecureEchange, une fois l'adresse email découverte on pourrait soit tenter une connexion via une attaque brute force sur le code OTP(cf ci-dessous) ou soit contacter le destinataire en se faisant passer pour l'office ou l'entreprise et se faire envoyer et recevoir les documents par un autre moyen. 
+
+Afin d'éviter cette attaque, nous avons mis en place la stratégie suivante :
+1. Si dans un délais de 3 minutes, nous détectons plus de 3 tentatives de vérification d'adresse email, **le SecureEchange shareId est blacklisté pour le site Public pendant 6 minutes.** 
+2. **Une erreur HTTP 429 avec un header 'Retry-after':360 est retournée.** 
+
+#### Demande de plusieurs code OTP pour le même SecureEchange en quelques minutes
+Le point d'entrée: 
+```
+/PublicAuth/{shareID/{email}/sendotp/{method}}
+```
+peut-être utilisé dans une attaque qui provoquerait l'envoi de plusieurs codes OTP en quelques minutes. Outre le coût des SMS, cela saturerait le mobile de l'utilisateur ou sa messagerie dans le cadre d'appels vocaux. 
+
+Pour limiter ce problème, nous avons adopté la stratégie suivante :
+1. Si dans **les 3 minutes après l'envoi d'un premier code OTP, 3 demandes ou plus sont effectués** :
+   1. **On marque Blacklisté pour 6 minutes,  le SecureEchange** shareId pour lequel le code OTP a été demandé plusieurs fois.
+   2. **Une erreur HTTP 429 avec un header 'Retry-after':360 est retournée.** 
+
+#### Brute force code de validation OTP
+Le point d'entrée:
+``` 
+/PublicAuth/{shareId}/{email}/verify/{OtpPassword}
+``` 
+peut-être utilisé dans une attaque de type brute force pour découvrir le code de validation OTP. Pour limiter le risque, nous avons adopté la stratégie suivante : 
+1. Le code OTP Password est valide 3 minutes
+2. Si dans les 3 minutes après la création du code OTP, il y a plus de 3 tentatives de vérification de code OTP de ce SecureEchange :
+   1. **Le code OTP est supprimé.**
+   2. **Le SecureEchange est blacklisté pour le site public pendant 6 minutes.**
+   3. **Une erreur HTTP 429 avec un header 'Retry-after':360 est retournée.** 
+
 
 ### Share
 | Méthode | URI | Paramètres | Retour | Payload | Action |
@@ -256,6 +294,8 @@ Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 | <font color="green">POST</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|Modifie unique le status du SecureEchange  | |
 | <font color="green">POST<font> | /share/{id}/file/{name}|(route) id: identifiant du SecureEchange<br>(route) name: catégorie du fichier à téléverser<br>(multipart) File |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |Téléverse le fichier joint| |
 | <font color="red">DELETE</font> | /share/{id}/file/{fileId} |(route) id: identifant du SecureEchange<br>(route) fileID: Identifiant du fichier requis à supprimer |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found | |
+
+
 
 ---
 ## API Admin
