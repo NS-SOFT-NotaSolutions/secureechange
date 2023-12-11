@@ -191,7 +191,7 @@ Tous les échanges créés, sont automatiquement attachés à l'office ou l'entr
  | ----- | ---- | -------| ---- | --- |
 | <font color="blue">GET</font> | /api/companies/info | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Propriétés principales de l'office ou l'entreprise |
 | <font color="blue">GET</font> | /api/companies/Accounting/Credit | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Nb Crédits Signature |
-| <font color="orange">PUT</font> | /api/companies/info |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>*:memo: Uniquemenent le champs Propriétes peut-être mis à jour*|
+| <font color="orange">PUT</font> | /api/companies/info |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>:memo: *Uniquemenent le champs Propriétes peut-être mis à jour*|
 
 #### Members
 | Méthode | URI | Paramètres | Retour | Payload |
