@@ -312,7 +312,7 @@ Ce n'est théoriquement pas possible car le SecureEchange ID pour lequel l'utili
 
 En l'état actuel, nous avons mis en place la stratédie suivante:
 1. Si l'id passé en paramètre est différent de l'ID du SecureEchange contenu dans le token, on **retourne une erreur HTTP (401) Unauthorized**.
-2. Si dans un délai de 3 minutes, cette API retourne plus de 3 Unauthorized, on **blacklist le token pendant 6 minutes**
+2. Si dans un délai de 3 minutes, cette API retourne plus de 10 Unauthorized pour le même token, on **blacklist le token pendant 6 minutes**
 3. Si le token est blacklisted,  **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 
