@@ -259,7 +259,7 @@ peut être utilisé dans une attaque de type brute force pour découvrir les adr
 
 Afin d'éviter cette attaque, nous avons mis en place la stratégie suivante :
 1. Si dans un délais de 3 minutes, nous détectons plus de 3 tentatives de vérification d'adresse email, **le SecureEchange shareId est blacklisté pour le site Public pendant 6 minutes.** 
-2. **Une erreur HTTP 429 avec un header 'Retry-after':360 est retournée.** 
+2. **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 #### Demande de plusieurs code OTP pour le même SecureEchange en quelques minutes
 Le point d'entrée: 
@@ -271,7 +271,7 @@ peut-être utilisé dans une attaque qui provoquerait l'envoi de plusieurs codes
 Pour limiter ce problème, nous avons adopté la stratégie suivante :
 1. Si dans **les 3 minutes après l'envoi d'un premier code OTP, 3 demandes ou plus sont effectués** :
    1. **On marque Blacklisté pour 6 minutes,  le SecureEchange** shareId pour lequel le code OTP a été demandé plusieurs fois.
-   2. **Une erreur HTTP 429 avec un header 'Retry-after':360 est retournée.** 
+   2. **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 #### Brute force code de validation OTP
 Le point d'entrée:
@@ -283,7 +283,7 @@ peut-être utilisé dans une attaque de type brute force pour découvrir le code
 2. Si dans les 3 minutes après la création du code OTP, il y a plus de 3 tentatives de vérification de code OTP de ce SecureEchange :
    1. **Le code OTP est supprimé.**
    2. **Le SecureEchange est blacklisté pour le site public pendant 6 minutes.**
-   3. **Une erreur HTTP 429 avec un header 'Retry-after':360 est retournée.** 
+   3. **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 
 ### Share
@@ -294,6 +294,26 @@ peut-être utilisé dans une attaque de type brute force pour découvrir le code
 | <font color="green">POST</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|Modifie unique le status du SecureEchange  | |
 | <font color="green">POST<font> | /share/{id}/file/{name}|(route) id: identifiant du SecureEchange<br>(route) name: catégorie du fichier à téléverser<br>(multipart) File |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |Téléverse le fichier joint| |
 | <font color="red">DELETE</font> | /share/{id}/file/{fileId} |(route) id: identifant du SecureEchange<br>(route) fileID: Identifiant du fichier requis à supprimer |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found | |
+
+#### Risques identifiés
+##### Tentative d'accès à un autre SecureEchange
+
+Les points d'entrées suivants: 
+```
+Get & Post /share/{id}
+Get /share/{id}/file/{fileid}
+Post /share/{id}/file/{name}
+Delete /share/{id}/file/{fileId}
+```
+peuvent servir de cible pour atteindre un SecureEchange autre que celui pour lequel on a été autorisé. 
+Ce n'est théoriquement pas possible car le SecureEchange ID pour lequel l'utilisateur a été autorisé est contenu dans son token. Et chaque point d'entrée vérifie que le paramètre id correspond bien au SecureEchange ID contenu dans son token. 
+
+:memo: *Dans toutes les méthodes de l'API **PublicAuth** ou **Share**, on pourrait se passer du paramètre id et utilisé celui de son token. Une prochaine révision de l'API prendra en charge cette modification.* 
+
+En l'état actuel, nous avons mis en place la stratédie suivante:
+1. Si l'id passé en paramètre est différent de l'ID du SecureEchange contenu dans le token, on **retourne une erreur HTTP (401) Unauthorized**.
+2. Si dans un délai de 3 minutes, cette API retourne plus de 3 Unauthorized, on **blacklist le token pendant 6 minutes**
+3. Si le token est blacklisted,  **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 
 
