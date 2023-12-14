@@ -11,7 +11,7 @@ Site web : ***[Présentation commerciale](https://www.notasolutions.fr/secure-ec
 ---
 # Présentation
 L'objectif de SecureEchange est de permettre, l'envoi et la réception de documents sensibles en assurant l'origine, l'intégrité et le suivi des actions des documents échangés.  
-Pour atteindre cet objectif, SecureEchange met en oeuvre plusieurs stratégies :
+Pour atteindre cet objectif, SecureEchange met en oeuvre plusieures stratégies :
 - Authentification forte de l'office ou l'entreprise qui initie le transfère.
 - Authentification à double facteurs du client final qui recoit et expédie des documents.
 - Signatures Avancée qualifiée eIDAS des documents demandés.
@@ -53,11 +53,11 @@ SecureEchange se compose des tiers suivants:
 <figcaption>Processus d'échanges bidirectionnel</figcaption>
 </figure>
 
-
+ 
 
 Comme on peut le comprendre depuis les schémas ci-dessus, SecureEchange doit interagir avec plusieurs acteurs:
 - Les utilisateurs de l'office ou de l'entreprise qui initient les échanges.
-- Le logiciel métier (LRA) dans lequel on trouve les fiches clients et les documents à envoyer mais aussi dans lequel on rangera les documents à recevoir
+- Le logiciel métier (LRA) dans lequel on trouve les fiches clients et les documents à envoyer mais aussi dans lequel on rangera les documents reçus
 - SMS Mode pour l'envoi de SMS dans le processus d'authentification à double facteur.
 - OODRIVE pour les demandes de signatures électroniques avancées eIDAS.
 - LexIA pour la reconnaissance et la vérification des RIBs.
@@ -94,15 +94,16 @@ Pour chacun de ces VERBS, nous exigeons de l'utilisateur une permission spécifi
 |<font color="orange"> PUT | Permission définie dans le jeton SecureEchange | **write:secure_echange** |
 | <font color="red">DELETE</font> | Permission définie dans le jeton SecureEchange | **delete:secure_echange** |
 
-Le jeton SecureEchange est généré par l'application après avoir vérifié l'identité de l'utilisateur par l'une des méthodes d'authentification exposé ci-dessus. 
+Le jeton SecureEchange est généré par l'application après avoir vérifié l'identité de l'utilisateur par l'une des méthodes d'authentification exposées ci-dessus. 
+<br>
 
 ## Cycle de vie d'un jeton d'authentification
 
-Le cycle de vie d'une jeton SecureEchange peut-être décrit:
+Le cycle de vie d'un jeton SecureEchange peut-être décrit:
 1. Création après vérification de l'identité pour **une durée de vie de 4 heures**
 2. Si pour le même utilisateur, il existe un jeton SecureEchange plus récent, **tous les anciens jetons sont blacklisted et ne peuvent plus accéder à l'application**. 
 3. Si **un même jeton SecureEchange povoque plusieurs erreurs HTTP (401) Unauthorized** en moins de 3 minutes, le jeton est **temporairement blacklisted pour une durée de 6 minutes**. L'utilisateur recoit alors une erreur HTTP **(429) Too many requests**
-4. Lorsque **le jeton a expiré**, plus aucun connexion n'est acceptée et l'utilisateur reçoit une erreur HTTP **(401) Unauthorized**. 
+4. Lorsque **le jeton a expiré**, plus aucune connexion n'est acceptée et l'utilisateur reçoit une erreur HTTP **(401) Unauthorized**. 
 
 
 ## Liste de contrôles d'accès sur les entités
@@ -110,11 +111,11 @@ Le cycle de vie d'une jeton SecureEchange peut-être décrit:
 Nous avons vu, dans le paragraphe précèdent, comment l'utilisateur pouvait accéder à l'une des méthodes d'un point d'entré d'une des API. 
 L'utilisateur peut exécuter le code contenu dans cette méthode. Parmis les opérations qu'il peut exécuter dans le système d'information, on trouve toutes les opérations du CRUD classique. SecureEchange est une application multi-tenants, il faut donc s'assurer de la séparation des données propres à chaque utilisateur. 
 Cette vérification d'accès s'effectue via le paradigm de **Liste de contrôle d'accès (ACL)** que possède chaque entité du système d'information. 
-Losque l'utilisatrice Alice execute un requête de demande la liste des SecureEchange, l'application lui retourne tous les SecureEchange pour lesquels Alice a obtenu le droit de lecture. 
+Losque l'utilisatrice Alice execute un requête de demande de la liste des SecureEchange, l'application lui retourne tous les SecureEchange pour lesquels Alice a obtenu le droit de lecture. 
 Chaque SecureEchange possède **2 listes de contrôle d'accès: Denied et Granted** .
 
 - ### Denied:
-  Cette liste spécifie toutes entités pour lesquelles, **on a explicitement interdit l'accès** soit en lecture, écriture, création ou suppression .
+  Cette liste spécifie toutes les entités pour lesquelles, **on a explicitement interdit l'accès** soit en lecture, écriture, création ou suppression .
 - ### Granted
   Cette liste spécifie toutes les entités pour lesquelles, **on a explicitement autorisé l'accès** soit en écriture, lecture, création ou suppression.
 
@@ -123,7 +124,7 @@ Chaque SecureEchange possède **2 listes de contrôle d'accès: Denied et Grante
   2. Si aucun Denied trouvé, vérification dans la liste des Granted
   3. Si aucun Denied trouvé et aucun Granted trouvé et si l'entité a un parent, on vérifie l'accès à l'entité parent. On parle d'héritage des droits d'accès.
 
-Le système des listes contrôle d'accès pour chaque entité et l'utilisation de l'héritage des listes de controle d'accès permet une granularité, une efficacité et une souplesse dans le contrôle d'accès.  C'est cette stratégie qui est utilisé dans les systèmes modernes. 
+Le système des listes contrôle d'accès pour chaque entité et l'utilisation de l'héritage des listes de controle d'accès permet une granularité, une efficacité et une souplesse dans le contrôle d'accès.  Cette stratégie est utilisée dans les systèmes modernes. 
 
 ### Exemples de permissions
 La liste de contrôle d'accès de La compagnie: 
@@ -177,13 +178,7 @@ La liste de contrôle d'accès de La compagnie:
 ## Authentification par clé REAL
 La clé REAL&reg; est un dispositif physique, sécurisée avec un code PIN et contenant un certificat de signature, élaboré par l'ADSN et sous l'autorité du Conseil Supérieur du Notariat qui permet de signer les actes électroniques et s'authentifier pour diverses formalités.  Ce dispositif est disponible pour les notaires et pour les clercs bien que les rôles et permissions soient spécifiques à chaque acteur. Ce dispositif dépend de l'autorité de certification Racine Notaires 20XX, cette autorité est qualifiée eIDAS. 
 Son utilisation dans le cadre de l'authentification des notaires et clercs permet une authentification forte des utilisateurs.  
-Cependant la profession, préfère que cette clé soit utilisée uniquement dans le cadre des signatures électroniques des actes et des formalités réglementaires. Son utilisation en tant que dispositif d'authentification pour les applications autres que celles réglementaires n'est pas préconisé ou encouragé.  
-
-## Authentification par Identifiant et mot de passe (Auth0)
-Pour tous les acteurs qui ne possèdent pas de dispositif sécurisé tel que la clé REAL&reg;, nous proposons une authentification basée sur un identifiant et mot de passe avec vérification de l'adresse email. Pour cela, nous mettons en oeuvre une authentification hébergée par [Auth0](https://auth0.com/docs). Cette authentification se base sur OAuth et délivre des Bearer tokens propres à chaque application, utilisateur. Elle intégre les permissions, les rôles par application ainsi que des metadata supplémentaires propre à l'utilisateur (SIRET de la société, identifiant unique, etc... )
-
-## Authentification SSO GenApi&copy; 
-GenApi &copy; (aka Septeo Notaires &copy;) est l'éditeur leader français du logiciel de rédaction d'actes pour des notaires. A ce jour, c'est le seul éditeur proposant un SSO d'authentification. Grâce à son SSO, l'utilisateur peut s'authentifier avec son identifant et mot de passe de son outil métier et permet de nous fournir un jeton d'authentification sur lequel nous nous baseons pour autoriser ou non l'accès à l'application SecureEchange. 
+Cependant la profession, préfère que cette clé soit utilisée uniquement dans le cadre des signatures électroniques des actes et des formalités réglementaires. Son utilisation en tant que dispositif d'authentification pour les applications autres que celles réglementaires n'est pas préconisée ou encouragée.  
 
 ## Authentification par clé AVOCAT&reg; ou Certinomis&reg;
 A l'instar de la clé REAL&reg;, il existe d'autres dispositifs physiques de sécurité disponibles pour les autres professions. 
@@ -191,7 +186,18 @@ En particulier, les avocats disposent d'une [clé d'authentification AVOCAT (anc
 Pour tous les professionnels qui ne sont ni Notaire ni Avocat, il est possible d'acquérir un dispositif physique de sécurité équivalent à la clé REAL&reg; ou AVOCAT&reg;, par exemple chez [Certinomis](https://www.certinomis.fr/produit/certinomis-decideur).
 L'usage de ces dispositifs de sécurité par l'utilisateur permet d'offrir un moyen fort d'authentification forte pour l'accès à l'application SecureEchange. 
 
+
+
+## Authentification par Identifiant et mot de passe (Auth0)
+Pour tous les acteurs qui ne possèdent pas de dispositif sécurisé tel que la clé REAL&reg;, nous proposons une authentification basée sur un identifiant et mot de passe avec vérification de l'adresse email. Pour cela, nous mettons en oeuvre une authentification hébergée par [Auth0](https://auth0.com/docs). Cette authentification se base sur OAuth et délivre des Bearer tokens propres à chaque application, utilisateur. Elle intégre les permissions, les rôles par application ainsi que des metadata supplémentaires propre à l'utilisateur (SIRET de la société, identifiant unique, etc... )
+
+## Authentification SSO GenApi&copy; 
+GenApi &copy; (aka Septeo Notaires &copy;) est l'éditeur leader français du logiciel de rédaction d'actes pour des notaires. A ce jour, c'est le seul éditeur proposant un SSO d'authentification. Grâce à son SSO, l'utilisateur peut s'authentifier avec son identifant et mot de passe de son outil métier et permet de nous fournir un jeton d'authentification sur lequel nous nous basons, pour autoriser ou non l'accès à l'application SecureEchange. 
+
+
+
 # Les API
+
 [Les interfaces de programmation ou Application Programming Interfaces (API)](https://fr.wikipedia.org/wiki/Interface_de_programmation) définissent un ensemble de fonctionnalités indépendantes ou liées qui servent de façade par laquelle un système ou logiciel offre des services à d'autres logiciels.  Les services exposés font abstraction de la complexité de leur fonctionnement et des ressources qu'ils utilisent. Cela permet aux logiciels qui les consomment de se concentrer uniquement sur la fonctionnalité proposée tout en laissant traiter la compléxité aux API. 
 Exemple d'API :
 [Le modèle Document Object Model (DOM)](https://fr.wikipedia.org/wiki/Document_Object_Model) qui permet la manipulation des objets du document d'une page HTML contenue dans un navigateur. 
@@ -212,7 +218,7 @@ SecureEchange définit des API réparties en plusieurs domaines :
 A ce découplage par domaine, il faut appliquer une répartition par acteur. 
 - Utilisateur de l'office ou l'entreprise : un jeu d'**API privés**  donne accès à toutes les fonctionnalités pour gérer le cycle de vie des échanges.
 - Le client final: un jeu d'**API public**  donne accès à un nombre limité de fonctionnalités qui permettront la récupération des documents et la transmission des documents requis. 
-- Les opérateurs du site SecureEchange: un jeu d'**API d'administration** permet la création des offices ou entreprises, la prise en compte des commandes et crédits  de Signature, la gestion des utilisateurs et la remontés de statistiques comptables pour le suivi dans notre ERP. 
+- Les opérateurs du site SecureEchange: un jeu d'**API d'administration** permet la création des offices ou entreprises, la prise en compte des commandes et crédits  de Signature, la gestion des utilisateurs et la remontée de statistiques comptables pour le suivi dans notre ERP. 
 
 Pour la publication de toutes nos API, nous avons choisi d'utiliser le modèle [Swagger RestFull respectant OpenApi V3](https://swagger.io/specification/). 
 
@@ -227,7 +233,7 @@ Chaque utilisateur authentifié, ne peut gérer que les SecureEchange de l'offic
 Lorsque l'utilisateur se présente pour une authentification utlisant un dispositif physique contenant sont certificat client, nous vérifions les prérequis suivants:
 
 1. L'utilisateur doit avoir **saisi son code PIN** de sa clé pour que l'application est accès au certificat client
-2. Le certificat client doit contenir les informations suivantes, en fonction son authorité:
+2. Le certificat client doit contenir les informations suivantes, en fonction son autorité:
    1. REAL 
       1. **ISSUER** doir être **REAL**
       2. Le CN doit contenir un code **conforme à la spécification du CSN**
@@ -254,10 +260,13 @@ Lorsque l'utilisateur se présente pour une authentification utlisant un disposi
    3. **delete:secure_echange**
    4. **create:secure_echange**
 <br>
+
 #### Auth0
+
 ##### Prérequis à l'authorization
-Lorsque l'utilisateur se présente avec un jeton Auth0 valide, nous vérifions plusieurs prérequis pour autoriser la généreration un jeton SecureEchange. 
-La liste de ces vérifications de prérequis est: 
+
+Lorsque l'utilisateur se présente avec un jeton Auth0 valide, nous vérifions plusieurs prérequis pour autoriser la génération un jeton SecureEchange. 
+La liste de ces prérequis est: 
 1. Le jeton Auth0 doit contenir a minima la **permission: read:secure_echange**.
 2. Le jeton Auth0 doit contenir a minima le **role : SecureEchangeMember**
 3. **L'email du jeton Auth0 doit avoir été validé** par la procédure Auth0.
@@ -278,8 +287,10 @@ Si l'un de ces prérequis n'est pas rempli, on retourne une **erreur HTTP (401) 
 <br>
 
 #### SSO GenApi
+
 ##### Prérequis à l'authorization
-Lorsque l'utilisateur se présente avec un jeton SSO GenApi, nous vérifions plusieurs prérequis pour autoriser le généreration d'un jeton SecureEchange. 
+
+Lorsque l'utilisateur se présente avec un jeton SSO GenApi, nous vérifions plusieurs prérequis pour autoriser la génération d'un jeton SecureEchange. 
 La liste de ces prérequis est :
 1. Le jeton SSO GenApi **doit contenir un tenant**
 2. Le jeton SSO GenApi **ne doit pas avoir expiré**
@@ -287,6 +298,7 @@ La liste de ces prérequis est :
 Si l'un de ces prérequis n'est pas rempli, on retourne une **erreur HTTP (401) Unauthorized**
 
 ##### Méthode pour une authentification avec un jeton SSO GenApi
+
  | Méthode | URI | Paramètres | Retour |
  | ----- | ---- | -------| ---- |
 |  <font color="blue">GET | **/api/iNotCloudAuth** | (query) service, (valeur par defaut) *SecureEchange*<br> (headers):exclamation: Authorization: **Bearer Genapi_Access_Token** | **(200) Success:<br>accessToken, <br>SecureEchange Bearer Token), <br>  description,<br>  expireAt,<br>  notBefore,<br>  issuedAt**<br><br>(400) Bad Request<br> (401) Unauthorized
@@ -327,7 +339,7 @@ Tous les échanges créés, sont automatiquement attachés à l'office ou l'entr
  | ----- | ---- | -------| ---- | --- |
 | <font color="blue">GET</font> | /api/share | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
 | <font color="blue">GET</font> | /api/share/{id}/audits | | **(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized <br> (429) Too many request|
-| <font color="blue">GET</font> | /api/share/{id}/file/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
+| <font color="blue">GET</font> | /api/share/{id}/file/{fileId} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized <br> (429) Too many request|
 | <font color="blue">GET</font> | /api/share/{id} ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized  <br> (429) Too many request|
 | <font color="green">POST</font> | /api/share ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|
 | <font color="green">POST</font> | /api/share/{id}/duplicate ||**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized  <br> (429) Too many request|
@@ -357,11 +369,6 @@ Tous les échanges créés, sont automatiquement attachés à l'office ou l'entr
 | <font color="blue">GET</font> | /api/Members/self | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales de l'utilisateur connecté. |
 | <font color="orange">PUT</font> | /api/Members |(body) Propriétés à mettre à jour |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized|Propriétés de l'office ou l'entreprise mis à jour. <br>:memo: *Uniquemenent les champs:<br> Propriétes<br>Firstname<br>Lastname<br>Email<br>peuvent-être mis à jour.*|
 
-#### SecureEchange
-API de test du jeton Access Token SecureEchange
- | Méthode | URI | Paramètres | Retour | Payload |
- | ----- | ---- | -------| ---- | --- |
- | <font color="blue">GET</font> | /api/SecureEchange | |**(200) Success**:<br><br> (400) Bad Request<br> (401) Unauthorized| Les propriétés principales du jeton de l'utilisateur connecté.<br>- Siret/CRPCEN<br>- UniqueID<br>- Name<br>- Email<br>- Liste des rôles<br>- Liste des permissions<br>- IsSecureEchangeAdmin(V/F)<br>- Tenant |
 
 ---
 ## API publics
@@ -391,13 +398,13 @@ Processus d'authentification du client final
 1. Le client clique sur le lien qu'il a reçu dans sa boite à lettre
 2. Dans la page d'authentification, il doit saisir son adresse email
 3. Vérification de l'adresse email saisie :
-   1. L'adresse email ne fait pas partie des destinataires, on retourne un Unauthorized
-4. L'adresse email a été validé, le client peut recevoir un code en fonction du canal choisi et du numéro de téléphone saisis par l'utilisateur de l'office ou l'entreprise
+   1. L'adresse email ne fait pas partie des destinataires, on retourne une erreur HTTP (401) Unauthorized
+4. L'adresse email a été validée, le client peut recevoir un code en fonction du canal choisi et du numéro de téléphone saisis par l'utilisateur de l'office ou l'entreprise
 5. Le client doit saisir le code envoyé sur le numéro de téléphone soit par SMS soit en message vocal.
-   1. Le code n'est pas le bon, on retourne Unauthorized
+   1. Le code n'est pas le bon, on retourne une erreur HTTP (401) Unauthorized
 6. Le code est validé, le client final accède à son SecureEchange.
 
-Les API qui permettent de prendre en charge ce processus sont PublicAuth.
+L'API qui permet de prendre en charge ce processus est publiée dans le point d'antré PublicAuth.
 
 ### PublicAuth
 
@@ -412,23 +419,28 @@ Les API qui permettent de prendre en charge ce processus sont PublicAuth.
 | <font color="blue">GET</font> |PublicAuth/{shareID}/{email}/verify/{otpPassword}|(route) shareId: identifiant SecureEchange<br>(route) email: email validé<br>(route) otpPassword: code à vérifier |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found<br> (429) Too many requests| Retourne le jeton d'auhtentification  |Controle le code de vérification et si ok génére le jeton d'authentification  |
 
 #### Risques identifiés
+
 ##### Brute force Email
-Le point d'entrée: 
+
+La méthode: 
+
 ```
 /PublicAuth/{shareId}/{email} 
 ```
-peut être utilisé dans une attaque de type brute force pour découvrir les adresses emails destinataires du SecureEchange, une fois l'adresse email découverte on pourrait soit tenter une connexion via une attaque brute force sur le code OTP(cf ci-dessous) ou soit contacter le destinataire en se faisant passer pour l'office ou l'entreprise et se faire envoyer et recevoir les documents par un autre moyen. 
+peut être utilisée dans une attaque de type brute force pour découvrir les adresses emails destinataires du SecureEchange, une fois l'adresse email découverte on pourrait soit tenter une connexion via une attaque brute force sur le code OTP(cf ci-dessous) ou soit contacter le destinataire en se faisant passer pour l'office ou l'entreprise et se faire envoyer et recevoir les documents par un autre moyen. 
 
 Afin d'éviter cette attaque, nous avons mis en place la stratégie suivante :
 1. Si dans un délais de 3 minutes, nous détectons plus de 3 tentatives de vérification d'adresse email, **le SecureEchange shareId est blacklisté pour le site Public pendant 6 minutes.** 
 2. **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 #### Demande de plusieurs code OTP pour le même SecureEchange en quelques minutes
-Le point d'entrée: 
+
+La méthode: 
+
 ```
 /PublicAuth/{shareID/{email}/sendotp/{method}}
 ```
-peut-être utilisé dans une attaque qui provoquerait l'envoi de plusieurs codes OTP en quelques minutes. Outre le coût des SMS, cela saturerait le mobile de l'utilisateur ou sa messagerie dans le cadre d'appels vocaux. 
+peut-être utilisée dans une attaque qui provoquerait l'envoi de plusieurs codes OTP en quelques minutes. Outre le coût des SMS, cela saturerait le mobile de l'utilisateur ou sa messagerie dans le cadre d'appels vocaux. 
 
 Pour limiter ce problème, nous avons adopté la stratégie suivante :
 1. Si dans **les 3 minutes après l'envoi d'un premier code OTP, 3 demandes ou plus sont effectués** :
@@ -436,11 +448,13 @@ Pour limiter ce problème, nous avons adopté la stratégie suivante :
    2. **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 #### Brute force code de validation OTP
-Le point d'entrée:
+
+La méthode:
+
 ``` 
 /PublicAuth/{shareId}/{email}/verify/{OtpPassword}
 ``` 
-peut-être utilisé dans une attaque de type brute force pour découvrir le code de validation OTP. Pour limiter le risque, nous avons adopté la stratégie suivante : 
+peut-être utilisée dans une attaque de type brute force pour découvrir le code de validation OTP. Pour limiter le risque, nous avons adopté la stratégie suivante : 
 1. Le code OTP Password est valide 3 minutes
 2. Si dans les 3 minutes après la création du code OTP, il y a plus de 3 tentatives de vérification de code OTP de ce SecureEchange :
    1. **Le code OTP est supprimé.**
@@ -448,7 +462,8 @@ peut-être utilisé dans une attaque de type brute force pour découvrir le code
    3. **Une erreur HTTP (429) avec un header 'Retry-after':360 est retournée.** 
 
 #### Rôles et permissions :lock: 
-Lorsque l'utilisateur a réussi toutes les étapes de l'authentification à double facteurs, les permissions et roles accordés sont:
+
+Lorsque l'utilisateur a réussi toutes les étapes de l'authentification à double facteurs, les permissions et rôles accordés sont:
 1. Role: **SecureEchangeGuest**
 2. Permissions:
    1. **read:secure_echange**
@@ -458,7 +473,8 @@ Lorsque l'utilisateur a réussi toutes les étapes de l'authentification à doub
 
 ### Share
 
-#### Prérequis à l'authorisation
+#### Prérequis à l'autorisation
+
 Lorsque l'utilisateur se présente avec un jeton SecureEchange, nous vérifions plusieurs prérequis . 
 La liste de ces prérequis est :
 1. Le jeton doit contenir a minima le **rôle : SecureEchangeGuest**
@@ -470,16 +486,16 @@ La liste de ces prérequis est :
 #### Méthodes pour le point d'entrée Share
 | Méthode | URI | Paramètres | Retour | Payload | Action |
 | ----- | ---- | -------| ---- | --- | --- |
-| <font color="blue">GET</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |les propriétés du SecureEchange| |
-| <font color="blue">GET</font> | /share/{id}/file/{fileId} |(route)id: identifiant du SecureEchange<br>(route) fileId: identifiant du fichier à télécharger| **(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|Le fichier encrypté||
-| <font color="orange">PUT</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found|Modifie unique le status du SecureEchange  | |
-| <font color="orange">PUT<font> | /share/{id}/file/{name}|(route) id: identifiant du SecureEchange<br>(route) name: catégorie du fichier à téléverser<br>(multipart) File |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found |Téléverse le fichier joint| |
-| <font color="red">DELETE</font> | /share/{id}/file/{fileId} |(route) id: identifant du SecureEchange<br>(route) fileID: Identifiant du fichier requis à supprimer |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found | |
+| <font color="blue">GET</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found <br> (429) Too many request|les propriétés du SecureEchange| |
+| <font color="blue">GET</font> | /share/{id}/file/{fileId} |(route)id: identifiant du SecureEchange<br>(route) fileId: identifiant du fichier à télécharger| **(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found <br> (429) Too many request|Le fichier encrypté||
+| <font color="orange">PUT</font> | /share/{id} |(route) id: identifiant du SecureEchange |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found <br> (429) Too many request|Modifie unique le status du SecureEchange  | |
+| <font color="orange">PUT<font> | /share/{id}/file/{name}|(route) id: identifiant du SecureEchange<br>(route) name: catégorie du fichier à téléverser<br>(multipart) File |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found <br> (429) Too many request|Téléverse le fichier joint| |
+| <font color="red">DELETE</font> | /share/{id}/file/{fileId} |(route) id: identifant du SecureEchange<br>(route) fileID: Identifiant du fichier requis à supprimer |**(200) Success**:<br><br> (400) Bad Request<br>(401) Unauthorized <br>(404) Not Found <br> (429) Too many request| Supprime le fichier  |
 
 #### Risques identifiés
 ##### Tentative d'accès à un autre SecureEchange
 
-Les points d'entrées suivants: 
+Les méthodes suivantes: 
 ```
 Get & Post /share/{id}
 Get /share/{id}/file/{fileid}
@@ -489,7 +505,7 @@ Delete /share/{id}/file/{fileId}
 peuvent servir de cible pour atteindre un SecureEchange autre que celui pour lequel on a été autorisé. 
 Ce n'est théoriquement pas possible car le SecureEchange ID pour lequel l'utilisateur a été autorisé est contenu dans son token. Et chaque point d'entrée vérifie que le paramètre id correspond bien au SecureEchange ID contenu dans son token. 
 
-:memo: *Dans toutes les méthodes de l'API **PublicAuth** ou **Share**, on pourrait se passer du paramètre id et utilisé celui de son token. Une prochaine révision de l'API prendra en charge cette modification.* 
+:memo: *Dans toutes les méthodes de l'API **PublicAuth** ou **Share**, on pourrait se passer du paramètre id et utiliser celui de son token. Une prochaine révision de l'API prendra en charge cette modification.* 
 
 En l'état actuel, nous avons mis en place la stratédie suivante:
 1. Si l'id passé en paramètre est différent de l'ID du SecureEchange contenu dans le token, on **retourne une erreur HTTP (401) Unauthorized**.
@@ -567,8 +583,8 @@ Seuls les comptes Auth0 ont accès à l'administration de l'application.
 
 
 ---
-## Site public et privée
-On distingue 2 catégories de sites, l'un privé et lautre public. 
+## Sites publics et privés
+On distingue 2 catégories de sites, l'un privé et l'autre public. 
 ### Les sites privés
 1. Toutes les API consommées par les utilisateurs de l'office ou l'entreprise . 
    1. Authentification
@@ -591,9 +607,9 @@ On distingue 2 catégories de sites, l'un privé et lautre public.
 ## Partenaires
 
 SecureEchange consomme plusieurs services dévlivrés par des partenaires :
-1. SMS Mode : la gestion des SMS ou textes vocaux
-2. OODRIVE: les signatures électroniques avancées qualifiées eIDAS
-3. LexIA: le moteur d'IA de Lexfluent pour la détection, reconnaissance et vérification des IBANs
+1. **SMS Mode** : la gestion des SMS ou textes vocaux
+2. **OODRIVE**: les signatures électroniques avancées qualifiées eIDAS
+3. **LexIA**: le moteur d'IA de Lexfluent pour la détection, reconnaissance et vérification des IBANs
 
 
 Toutes ces services sont accessibles via leur API REST depuis les API Publics. Sauf l'application LexIA qui est appelé depuis l'application Javascript afin de ne pas transférer, en clair, le document à analyser à l'infrastructure de SecureEchange. On ne doit jamais accèder au document en clair dans le back-end de SecureEchange. 
@@ -646,7 +662,7 @@ docker build -f Dockerfile_preprod -t xxxxxxx/preprod_public_secure_echange .
 docker push xxxxxxx/preprod_public_secure_echange
 ```
 
-### INTERNAL APIs image
+### Privé APIs image
 ```
 docker build -f Dockerfile_internal -t xxxxxxx/internal_secure_echange  .
 docker push xxxxxxx/internal_secure_echange
